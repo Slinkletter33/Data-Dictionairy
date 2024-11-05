@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eVars Documentation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script> <!-- Specify version 2.0.3 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
         /* Add some basic styling */
         body { font-family: Arial, sans-serif; margin: 20px; }
@@ -45,7 +45,7 @@
 
                     eVars.push({
                         title: title,
-                        content: content.replace(/<[^>]*>/g, ' ').trim() // Remove HTML tags
+                        content: content // Keep the HTML content for later rendering
                     });
                 });
 
@@ -69,7 +69,7 @@
                     const resultsContainer = document.getElementById('results');
                     resultsContainer.innerHTML = results.map(result => {
                         const doc = eVars[result.ref];
-                        return `<h3>${doc.title}</h3><p>${doc.content}</p>`;
+                        return `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`; // Convert content to HTML
                     }).join('');
                 });
             })
