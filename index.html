@@ -140,8 +140,8 @@ body {
 
                 // Step 4: Create the Lunr.js index
                 const index = lunr(function () {
-                    this.field('title');
-                    this.field('content');
+                    this.field('title')
+                    //this.field('content');
 
                     eVars.forEach(function (doc, id) {
                         this.add({ id: id, ...doc });
