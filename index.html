@@ -7,74 +7,73 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
-       /* General Body Styling */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f8fc;
-    color: #333333;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center-aligns the content */
-}
+        /* General Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f8fc;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center-aligns the content */
+        }
 
-/* Title Styling */
-h1 {
-    color: #0071bc;
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    text-align: center;
-}
+        /* Title Styling */
+        h1 {
+            color: #0071bc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
 
-/* Container for filter and search */
-.search-container {
-    width: 25%; /* Set to 1/4 of the width */
-    min-width: 200px; /* Optional: ensure it doesn't shrink too small */
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-}
+        /* Container for filter and search */
+        .search-container {
+            width: 25%; /* Set to 1/4 of the width */
+            min-width: 200px; /* Optional: ensure it doesn't shrink too small */
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* Search Bar and Dropdown Styling */
-input[type="text"], select {
-    width: 100%; /* Full width within container */
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    color: #333333;
-    margin-bottom: 10px;
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
-}
+        /* Search Bar and Dropdown Styling */
+        input[type="text"], select {
+            width: 100%; /* Full width within container */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            color: #333333;
+            margin-bottom: 10px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
 
-/* Search Results Container */
-#results {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Full width for result section */
-    max-width: 800px; /* Optional: limit max width */
-}
+        /* Search Results Container */
+        #results {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Full width for result section */
+            max-width: 800px; /* Optional: limit max width */
+        }
 
-/* Result Card */
-.result-card {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #e1e4e8;
-    border-radius: 8px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
+        /* Result Card */
+        .result-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
 
-/* Highlight inactive items */
-.result-card.inactive {
-    background-color: #f8d7da; /* Light red for inactive */
-    border-color: #dc3545; /* Red border for emphasis */
-}
-
+        /* Highlight inactive items */
+        .result-card.inactive {
+            background-color: #f8d7da; /* Light red for inactive */
+            border-color: #dc3545; /* Red border for emphasis */
+        }
     </style>
 </head>
 <body>
@@ -118,13 +117,11 @@ window.onload = function() {
         sections.forEach(section => {
             const title = section.innerText;
 
-            // Extract status from the content
-            const statusText = section.nextElementSibling?.innerHTML;
-            const statusMatch = statusText?.match(/Status:\s*(.*?)(?=<)/);
-            const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'unknown'; // Normalize to lowercase
-
+            // Extract content and check for "Status: inactive"
             const content = section.nextElementSibling?.innerHTML || '';
-            dataItems.push({ title, content, type: source.type, status });
+            const isInactive = content.toLowerCase().includes('status: inactive');
+
+            dataItems.push({ title, content, type: source.type, isInactive });
         });
     };
 
@@ -154,7 +151,7 @@ window.onload = function() {
                 // Display results
                 if (filteredItems.length > 0) {
                     resultsContainer.innerHTML = filteredItems.map(doc => {
-                        const inactiveClass = doc.status === 'inactive' ? 'inactive' : '';
+                        const inactiveClass = doc.isInactive ? 'inactive' : '';
                         return `
                             <div class="result-card ${inactiveClass}">
                                 <h3>${doc.title}</h3>
