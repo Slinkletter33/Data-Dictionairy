@@ -111,76 +111,75 @@ body {
 
 <script>
     window.onload = function() {
-        // Step 1: Fetch the Markdown file from the correct raw URL
-        fetch('https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(data => {
-                // Step 2: Convert Markdown to HTML and parse it
-                const html = marked(data);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+        const sources = [
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+        ];
+        
+        const eVars = []; // Combined array for all items
 
-                // Step 3: Extract eVars from parsed HTML
-                const eVars = [];
-                const sections = doc.querySelectorAll('h2');
-                sections.forEach(section => {
-                    const title = section.innerText;
-                    const content = section.nextElementSibling.innerHTML;
+        // Function to fetch, parse, and process each Markdown file
+        const fetchAndProcess = async (source) => {
+            const response = await fetch(source.url);
+            if (!response.ok) throw new Error(`Error fetching ${source.type}`);
+            
+            const data = await response.text();
+            const html = marked(data);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract relevant sections (assuming `h2` as headers)
+            const sections = doc.querySelectorAll('h2');
+            sections.forEach(section => {
+                const title = section.innerText;
+                const content = section.nextElementSibling?.innerHTML || '';
+                eVars.push({ title: `${source.type}: ${title}`, content, type: source.type });
+            });
+        };
 
-                    eVars.push({
-                        title: title,
-                        content: content
-                    });
-                });
-
-                // Step 4: Create the Lunr.js index
+        // Fetch all sources and then initialize the search index
+        Promise.all(sources.map(fetchAndProcess))
+            .then(() => {
                 const index = lunr(function () {
-                    this.field('title')
-                    //this.field('content');
-
-                    eVars.forEach(function (doc, id) {
+                    this.field('title');
+                    this.field('content');
+                    eVars.forEach((doc, id) => {
                         this.add({ id: id, ...doc });
                     }, this);
                 });
 
-                // Function to display all eVars
+                // Function to display all results
                 const displayAllResults = () => {
                     const resultsContainer = document.getElementById('results');
-                    resultsContainer.innerHTML = eVars.map(doc => `<div class="result-card"><h3>${doc.title}</h3><p>${marked(doc.content)}</p></div>`).join('');
+                    resultsContainer.innerHTML = eVars.map(doc => `
+                        <div class="result-card">
+                            <h3>${doc.title}</h3>
+                            <p>${marked(doc.content)}</p>
+                        </div>
+                    `).join('');
                 };
 
-                // Display all results initially
+                // Initial display of all items
                 displayAllResults();
 
-                // Step 5: Implement the search functionality
+                // Search functionality
                 document.getElementById('search').addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase(); // Normalize query
+                    const query = this.value.trim().toLowerCase();
                     const resultsContainer = document.getElementById('results');
-
                     if (!query) {
-                        // If no query, display all eVars
                         displayAllResults();
                         return;
                     }
 
-                    // Search the index
-                    const results = index.query(function (q) {
-                        q.term(query, { boost: 10 });
-                    });
-
-                    // Add logic to search for numeric values in titles
-                    const numericResults = eVars.filter(doc => doc.title.toLowerCase().includes(query));
+                    // Search through Lunr index
+                    const results = index.search(query);
                     const indexResults = results.map(result => eVars[result.ref]);
+                    const numericResults = eVars.filter(doc => doc.title.toLowerCase().includes(query));
 
-                    // Combine results from both searches
+                    // Combine results
                     const filteredResults = [...new Set([...indexResults, ...numericResults])];
 
-                    // Check if results are found
                     if (filteredResults.length > 0) {
                         resultsContainer.innerHTML = filteredResults.map(doc => {
                             const highlightedTitle = doc.title.replace(new RegExp(query, 'gi'), match => `<span class="highlight">${match}</span>`);
@@ -192,7 +191,7 @@ body {
                     }
                 });
             })
-            .catch(error => console.error('Error fetching eVars.md:', error));
+            .catch(error => console.error('Error fetching Markdown files:', error));
     };
 </script>
 
