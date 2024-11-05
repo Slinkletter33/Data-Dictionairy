@@ -70,7 +70,7 @@
 
                 // Step 5: Implement the search functionality
                 document.getElementById('search').addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase().replace(/\s+/g, ''); // Normalize query
+                    const query = this.value.trim().toLowerCase(); // Normalize query
                     const resultsContainer = document.getElementById('results');
 
                     if (!query) {
@@ -79,15 +79,17 @@
                         return;
                     }
 
-                    // Search the index with normalized query
+                    // Search the index
                     const results = index.query(function (q) {
                         q.term(query, { boost: 10 });
                     });
 
-                    // Add a search for numeric values in titles
+                    // Add logic to search for numeric values in titles
                     const numericResults = eVars.filter(doc => doc.title.toLowerCase().includes(query));
+                    const indexResults = results.map(result => eVars[result.ref]);
 
-                    const filteredResults = [...new Set([...results.map(result => eVars[result.ref]), ...numericResults])];
+                    // Combine results from both searches
+                    const filteredResults = [...new Set([...indexResults, ...numericResults])];
 
                     if (filteredResults.length > 0) {
                         resultsContainer.innerHTML = filteredResults.map(doc => `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`).join('');
