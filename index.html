@@ -59,6 +59,15 @@
                     }, this);
                 });
 
+                // Function to display all eVars
+                const displayAllResults = () => {
+                    const resultsContainer = document.getElementById('results');
+                    resultsContainer.innerHTML = eVars.map(doc => `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`).join('');
+                };
+
+                // Display all results initially
+                displayAllResults();
+
                 // Step 5: Implement the search functionality
                 document.getElementById('search').addEventListener('input', function() {
                     const query = this.value.trim().toLowerCase();
@@ -66,7 +75,7 @@
 
                     if (!query) {
                         // If no query, display all eVars
-                        resultsContainer.innerHTML = eVars.map(doc => `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`).join('');
+                        displayAllResults();
                         return;
                     }
 
