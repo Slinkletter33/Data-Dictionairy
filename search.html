@@ -6,8 +6,10 @@
     <title>Markdown Search</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
         #results { margin-top: 20px; }
+        h2 { margin-bottom: 10px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -19,13 +21,31 @@
 <div id="results"></div>
 
 <script>
-    let markdownContent = ''; // Store the Markdown content
+    // Markdown content stored as a string
+    const markdownContent = `
+# eVars (Conversion Variables)
 
-    // Function to load Markdown content (you can use fetch API to get from a file)
-    async function loadMarkdown() {
-        const response = await fetch('path_to_your_file.md'); // Replace with your file path
-        markdownContent = await response.text();
-    }
+## Table of Contents
+- [eVar1: Product Category](#evar1-product-category)
+- [eVar2: User Type](#evar2-user-type)
+- [eVar3: Campaign Source](#evar3-campaign-source)
+
+## eVar1: Product Category
+- **Description**: Tracks the main category of the product viewed or purchased.
+- **Example Values**: "Electronics", "Clothing"
+- **Page Context**: Product detail pages, checkout pages
+- **Notes**: Consistent across product-related pages.
+
+## eVar2: User Type
+- **Description**: Indicates the type of user (e.g., "New" or "Returning").
+- **Example Values**: "New", "Returning"
+- **Page Context**: All pages
+
+## eVar3: Campaign Source
+- **Description**: Tracks the source of the traffic or campaign.
+- **Example Values**: "Email", "Social Media"
+- **Page Context**: Landing pages
+    `;
 
     // Search and display results
     function searchMarkdown() {
@@ -38,14 +58,17 @@
             const body = sections[i + 1].trim();
 
             if (header.toLowerCase().includes(keyword) || body.toLowerCase().includes(keyword)) {
-                results += `<h2>${header}</h2>${body}`;
+                results += `<h2>${header}</h2>${marked(body)}`;
             }
         }
 
-        document.getElementById('results').innerHTML = marked(results); // Render Markdown
+        // Show results or a message if no matches found
+        if (results) {
+            document.getElementById('results').innerHTML = results;
+        } else {
+            document.getElementById('results').innerHTML = '<p>No results found.</p>';
+        }
     }
-
-    loadMarkdown(); // Load the Markdown file on page load
 </script>
 
 </body>
