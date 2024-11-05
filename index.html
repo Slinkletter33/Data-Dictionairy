@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adobe Data Dictionairy</title>
+    <title>Adobe Data Dictionary</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
@@ -76,8 +76,12 @@ input[type="text"], select {
     border-color: #ff9800; /* Orange border for emphasis */
 }
 
+/* Highlight inactive items */
+.result-card.inactive {
+    background-color: #f8d7da; /* Light red for inactive */
+    border-color: #dc3545; /* Red border for emphasis */
+}
 
-        
     </style>
 </head>
 <body>
@@ -124,7 +128,7 @@ window.onload = function() {
             // Extract status from the content
             const statusText = section.nextElementSibling?.innerHTML;
             const statusMatch = statusText?.match(/Status:\s*(.*?)(?=<)/);
-            const status = statusMatch ? statusMatch[1].trim() : 'Unknown';
+            const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'unknown'; // Normalize to lowercase
 
             const content = section.nextElementSibling?.innerHTML || '';
             dataItems.push({ title, content, type: source.type, status });
@@ -157,7 +161,7 @@ window.onload = function() {
                 // Display results
                 if (filteredItems.length > 0) {
                     resultsContainer.innerHTML = filteredItems.map(doc => `
-                        <div class="result-card ${doc.status.toLowerCase() === 'active' ? 'active' : ''}">
+                        <div class="result-card ${doc.status === 'active' ? 'active' : 'inactive'}">
                             <h3>${doc.title}</h3>
                             <p>${marked(doc.content)}</p>
                         </div>
@@ -186,7 +190,6 @@ window.onload = function() {
         })
         .catch(error => console.error('Error fetching Markdown files:', error));
 };
-
 </script>
 
 </body>
