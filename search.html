@@ -1,0 +1,43 @@
+---
+layout: default
+title: Search
+---
+
+<h1>Search eVars and Props</h1>
+<input type="text" id="search-input" placeholder="Type to search..." onkeyup="searchFunction()">
+<ul id="results"></ul>
+
+<script>
+    // Array to hold Markdown content
+    const markdownFiles = ['eVars.md'];
+    let searchData = [];
+
+    // Function to fetch and load Markdown content
+    async function loadMarkdown() {
+        const promises = markdownFiles.map(async (file) => {
+            const response = await fetch(file);
+            const text = await response.text();
+            const title = file.replace('.md', ''); // Use filename as title
+            searchData.push({ title, content: text });
+        });
+        await Promise.all(promises);
+    }
+
+    // Function to search through the loaded content
+    function searchFunction() {
+        const input = document.getElementById('search-input').value.toLowerCase();
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+
+        searchData.forEach(item => {
+            if (item.content.toLowerCase().includes(input)) {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.title}</strong>: ${item.content}`;
+                results.appendChild(li);
+            }
+        });
+    }
+
+    // Load the Markdown files when the page is ready
+    window.onload = loadMarkdown;
+</script>
