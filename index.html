@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eVars Documentation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
+    <script src="https://cdn.rawgit.com/markedjs/marked/master/marked.min.js"></script>
+    <style>
+        /* Add some basic styling */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #results { margin-top: 20px; }
+        h3 { margin: 0; }
+    </style>
+</head>
+<body>
+
+<h1>eVars (Conversion Variables)</h1>
+
+<input type="text" id="search" placeholder="Search eVars...">
+<div id="results"></div>
+
+<script>
+    // Step 1: Fetch the Markdown file
+    fetch('eVars.md')
+        .then(response => response.text())
+        .then(data => {
+            // Step 2: Convert Markdown to HTML and parse it
+            const html = marked(data);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Step 3: Extract eVars from parsed HTML
+            const eVars = [];
+            const sections = doc.querySelectorAll('h2'); // Assuming eVars are under h2 tags
+            sections.forEach(section => {
+                const title = section.innerText;
+                const content = section.nextElementSibling.innerHTML; // Assuming the content follows the header
+
+                eVars.push({
+                    title: title,
+                    content: content.replace(/<[^>]*>/g, ' ').trim() // Remove HTML tags
+                });
+            });
+
+            // Step 4: Create the Lunr.js index
+            const index = lunr(function () {
+                this.field('title');
+                this.field('content');
+
+                eVars.forEach(function (doc, id) {
+                    this.add({ id: id, ...doc });
+                }, this);
+            });
+
+            // Step 5: Implement the search functionality
+            document.getElementById('search').addEventListener('input', function() {
+                const query = this.value;
+                const results = index.query(function (q) {
+                    q.term(query, { boost: 10 });
+                });
+
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = results.map(result => {
+                    const doc = eVars[result.ref];
+                    return `<h3>${doc.title}</h3><p>${doc.content}</p>`;
+                }).join('');
+            });
+        })
+        .catch(error => console.error('Error fetching eVars.md:', error));
+</script>
+
+</body>
+</html>
