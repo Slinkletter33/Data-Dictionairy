@@ -67,6 +67,21 @@
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+            .result-card {
+    padding: 15px;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+.result-card.repurposed {
+    background-color: #ffecb3; /* Light yellow color for repurposed items */
+    border-color: #ff9800; /* Orange border for emphasis */
+}
+
         }
     </style>
 </head>
@@ -87,7 +102,7 @@
 <div id="results"></div>
 
 <script>
-    window.onload = function() {
+window.onload = function() {
     const sources = [
         { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
         { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
@@ -110,8 +125,14 @@
         const sections = doc.querySelectorAll('h2');
         sections.forEach(section => {
             const title = section.innerText;
+
+            // Extract status from the content
+            const statusText = section.nextElementSibling?.innerHTML;
+            const statusMatch = statusText?.match(/Status:\s*(.*?)(?=<)/);
+            const status = statusMatch ? statusMatch[1].trim() : 'Unknown';
+
             const content = section.nextElementSibling?.innerHTML || '';
-            dataItems.push({ title, content, type: source.type });
+            dataItems.push({ title, content, type: source.type, status });
         });
     };
 
@@ -141,7 +162,7 @@
                 // Display results
                 if (filteredItems.length > 0) {
                     resultsContainer.innerHTML = filteredItems.map(doc => `
-                        <div class="result-card">
+                        <div class="result-card ${doc.status.toLowerCase() === 'active' ? 'active' : ''}">
                             <h3>${doc.title}</h3>
                             <p>${marked(doc.content)}</p>
                         </div>
