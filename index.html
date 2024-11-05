@@ -112,9 +112,9 @@ body {
 <script>
     window.onload = function() {
         const sources = [
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md' }
         ];
         
         const eVars = []; // Combined array for all items
@@ -122,7 +122,7 @@ body {
         // Function to fetch, parse, and process each Markdown file
         const fetchAndProcess = async (source) => {
             const response = await fetch(source.url);
-            if (!response.ok) throw new Error(`Error fetching ${source.type}`);
+            if (!response.ok) throw new Error(`Error fetching ${source.url}`);
             
             const data = await response.text();
             const html = marked(data);
@@ -134,7 +134,7 @@ body {
             sections.forEach(section => {
                 const title = section.innerText;
                 const content = section.nextElementSibling?.innerHTML || '';
-                eVars.push({ `${title}`, content, type: source.type });
+                eVars.push({ title, content });
             });
         };
 
@@ -142,6 +142,7 @@ body {
         Promise.all(sources.map(fetchAndProcess))
             .then(() => {
                 const index = lunr(function () {
+                    this.field('title');
                     this.field('content');
                     eVars.forEach((doc, id) => {
                         this.add({ id: id, ...doc });
@@ -193,6 +194,7 @@ body {
             .catch(error => console.error('Error fetching Markdown files:', error));
     };
 </script>
+
 
 </body>
 </html>
