@@ -134,7 +134,7 @@ body {
             sections.forEach(section => {
                 const title = section.innerText;
                 const content = section.nextElementSibling?.innerHTML || '';
-                eVars.push({ title: `${source.type}: ${title}`, content, type: source.type });
+                eVars.push({ `${title}`, content, type: source.type });
             });
         };
 
