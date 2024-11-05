@@ -9,6 +9,7 @@
         .search-container { margin-bottom: 20px; }
         .results { margin-top: 20px; }
         .result-item { margin: 10px 0; }
+        h2 { margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -28,30 +29,54 @@
         const content = document.getElementById('content');
 
         // Load the Markdown file
-        fetch('eVars.md')
+        fetch('evars.md')
             .then(response => response.text())
             .then(data => {
                 content.innerHTML = marked(data); // Convert Markdown to HTML
-                
+
+                // Display all results initially
+                displayAllResults();
+
                 // Add search functionality
                 searchInput.addEventListener('input', () => {
                     const query = searchInput.value.toLowerCase();
-                    resultsContainer.innerHTML = ''; // Clear previous results
-
-                    // Search through the headings and paragraphs
-                    const items = content.querySelectorAll('h2, p');
-                    items.forEach(item => {
-                        if (item.textContent.toLowerCase().includes(query)) {
-                            // Create result item
-                            const resultItem = document.createElement('div');
-                            resultItem.classList.add('result-item');
-                            resultItem.innerHTML = `<strong>${item.tagName === 'H2' ? item.textContent : ''}</strong><p>${item.tagName === 'P' ? item.textContent : ''}</p>`;
-                            resultsContainer.appendChild(resultItem);
-                        }
-                    });
+                    filterResults(query);
                 });
             })
             .catch(error => console.error('Error loading Markdown file:', error));
+
+        // Function to display all results
+        function displayAllResults() {
+            const items = content.querySelectorAll('h2, p');
+            items.forEach(item => {
+                if (item.tagName === 'H2') {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('result-item');
+                    resultItem.innerHTML = `<strong>${item.textContent}</strong>`;
+                    resultsContainer.appendChild(resultItem);
+                } else if (item.tagName === 'P') {
+                    const lastResultItem = resultsContainer.lastElementChild;
+                    if (lastResultItem) {
+                        lastResultItem.innerHTML += `<p>${item.textContent}</p>`;
+                    }
+                }
+            });
+        }
+
+        // Function to filter results based on search query
+        function filterResults(query) {
+            resultsContainer.innerHTML = ''; // Clear previous results
+            const items = content.querySelectorAll('h2, p');
+            items.forEach(item => {
+                if (item.textContent.toLowerCase().includes(query)) {
+                    // Create result item
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('result-item');
+                    resultItem.innerHTML = `<strong>${item.tagName === 'H2' ? item.textContent : ''}</strong><p>${item.tagName === 'P' ? item.textContent : ''}</p>`;
+                    resultsContainer.appendChild(resultItem);
+                }
+            });
+        }
     </script>
 </body>
 </html>
