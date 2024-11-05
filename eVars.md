@@ -9,14 +9,15 @@
 - **Status**: archived
 - **Tags**: sessions
 
-## eVar2: dimension_86
-- **Description**: Purchase status
-- **Example Values**: product_page
+## eVar2: Trip Duration
+- **Description**: Number of days from the first segment departure to the final segment departure. For One-Way trips, the duration is always 1
+- **Example Values**: 7
 - **Page Context**: [Specify page context]
 - **Notes**: User left items in cart
 - **Exceptions**: None
 - **Status**: inactive
 - **Tags**: demographics
+- **Repurposed**: NO
 
 ## eVar3: dimension_12
 - **Description**: Location data
