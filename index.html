@@ -47,13 +47,20 @@
 - **Description**: Tracks the source of the traffic or campaign.
 - **Example Values**: "Email", "Social Media"
 - **Page Context**: Landing pages
-    `;
+`;
 
     function searchMarkdown() {
         const keyword = document.getElementById('searchInput').value.toLowerCase();
-        console.log("Searching for:", keyword); // Debug line
+        const resultsContainer = document.getElementById('results');
+        
+        // Check if the input is empty
+        if (keyword === '') {
+            // If empty, show all content
+            resultsContainer.innerHTML = marked(markdownContent);
+            return;
+        }
+
         const sections = markdownContent.split(/(## [^\n]+)/).filter(Boolean);
-        console.log("Sections found:", sections); // Debug line
         let results = '';
 
         for (let i = 0; i < sections.length; i += 2) {
@@ -68,7 +75,6 @@
         }
 
         // Show results or a message if no matches found
-        const resultsContainer = document.getElementById('results');
         if (results) {
             resultsContainer.innerHTML = results;
         } else {
