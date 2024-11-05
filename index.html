@@ -88,89 +88,89 @@
 
 <script>
     window.onload = function() {
-        const sources = [
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
-        ];
+    const sources = [
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+    ];
+
+    const dataItems = []; // Combined array for all items
+
+    // Function to fetch, parse, and process each Markdown file
+    const fetchAndProcess = async (source) => {
+        const response = await fetch(source.url);
+        if (!response.ok) throw new Error(`Error fetching ${source.url}`);
         
-        const dataItems = []; // Combined array for all items
-
-        // Function to fetch, parse, and process each Markdown file
-        const fetchAndProcess = async (source) => {
-            const response = await fetch(source.url);
-            if (!response.ok) throw new Error(`Error fetching ${source.url}`);
-            
-            const data = await response.text();
-            const html = marked(data);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Extract relevant sections (assuming `h2` as headers)
-            const sections = doc.querySelectorAll('h2');
-            sections.forEach(section => {
-                const title = section.innerText;
-                const content = section.nextElementSibling?.innerHTML || '';
-                dataItems.push({ title, content, type: source.type });
-            });
-        };
-
-        // Fetch all sources and then initialize the search index
-        Promise.all(sources.map(fetchAndProcess))
-            .then(() => {
-                const index = lunr(function () {
-                    this.field('title');
-                    this.field('content');
-                    dataItems.forEach((doc, id) => {
-                        this.add({ id: id, ...doc });
-                    }, this);
-                });
-
-                // Function to display filtered results based on search query and filter type
-                const displayResults = (query = '', filterType = 'all') => {
-                    const resultsContainer = document.getElementById('results');
-                    
-                    // Filter dataItems based on query and type
-                    const filteredItems = dataItems.filter(doc => {
-                        const matchesType = filterType === 'all' || doc.type === filterType;
-                        const matchesQuery = query ? 
-                            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) : 
-                            true;
-                        return matchesType && matchesQuery;
-                    });
-
-                    // Display results
-                    if (filteredItems.length > 0) {
-                        resultsContainer.innerHTML = filteredItems.map(doc => `
-                            <div class="result-card">
-                                <h3>${doc.title}</h3>
-                                <p>${marked(doc.content)}</p>
-                            </div>
-                        `).join('');
-                    } else {
-                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
-                    }
-                };
-
-                // Event listener for search input
-                document.getElementById('search').addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase();
-                    const filterType = document.getElementById('filter').value;
-                    displayResults(query, filterType);
-                });
-
-                // Event listener for filter dropdown
-                document.getElementById('filter').addEventListener('change', function() {
-                    const filterType = this.value;
-                    const query = document.getElementById('search').value.trim().toLowerCase();
-                    displayResults(query, filterType);
-                });
-
-                // Initial display of all items
-                displayResults();
-            })
-            .catch(error => console.error('Error fetching Markdown files:', error));
+        const data = await response.text();
+        const html = marked(data);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Extract relevant sections (assuming `h2` as headers)
+        const sections = doc.querySelectorAll('h2');
+        sections.forEach(section => {
+            const title = section.innerText;
+            const content = section.nextElementSibling?.innerHTML || '';
+            dataItems.push({ title, content, type: source.type });
+        });
     };
+
+    // Fetch all sources and then initialize the search index
+    Promise.all(sources.map(fetchAndProcess))
+        .then(() => {
+            const index = lunr(function () {
+                this.field('title'); // Only search the title field
+                dataItems.forEach((doc, id) => {
+                    this.add({ id: id, title: doc.title, content: doc.content });
+                }, this);
+            });
+
+            // Function to display filtered results based on search query and filter type
+            const displayResults = (query = '', filterType = 'all') => {
+                const resultsContainer = document.getElementById('results');
+                
+                // Filter dataItems based on query and type
+                const filteredItems = dataItems.filter(doc => {
+                    const matchesType = filterType === 'all' || doc.type === filterType;
+                    const matchesQuery = query ? 
+                        doc.title.toLowerCase().includes(query) : // Only search title
+                        true;
+                    return matchesType && matchesQuery;
+                });
+
+                // Display results
+                if (filteredItems.length > 0) {
+                    resultsContainer.innerHTML = filteredItems.map(doc => `
+                        <div class="result-card">
+                            <h3>${doc.title}</h3>
+                            <p>${marked(doc.content)}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
+                }
+            };
+
+            // Event listener for search input
+            document.getElementById('search').addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                const filterType = document.getElementById('filter').value;
+                displayResults(query, filterType);
+            });
+
+            // Event listener for filter dropdown
+            document.getElementById('filter').addEventListener('change', function() {
+                const filterType = this.value;
+                const query = document.getElementById('search').value.trim().toLowerCase();
+                displayResults(query, filterType);
+            });
+
+            // Initial display of all items
+            displayResults();
+        })
+        .catch(error => console.error('Error fetching Markdown files:', error));
+};
+
 </script>
 
 </body>
