@@ -1,5 +1,5 @@
 # Data-Dictionairy
 ## Table of Contents
-- [Search](./search.html)
+- [Search](./index.html)
 - [eVars](./eVars.md)
 - [Props](./props.md)
