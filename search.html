@@ -18,9 +18,23 @@ title: Search
             const response = await fetch(file);
             const text = await response.text();
             const title = file.replace('.md', ''); // Use filename as title
-            searchData.push({ title, content: text });
+            
+            // Create a structured object with sections
+            const sections = text.split(/## /).slice(1).map(section => {
+                const [header, ...contentParts] = section.split('\n');
+                const content = contentParts.join('\n').trim();
+                return { header: header.trim(), content: content.trim() };
+            });
+
+            searchData.push({ title, sections });
         });
         await Promise.all(promises);
+    }
+
+    // Function to highlight the search term
+    function highlightText(text, term) {
+        const regex = new RegExp(`(${term})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
     }
 
     // Function to search through the loaded content
@@ -30,11 +44,16 @@ title: Search
         results.innerHTML = '';
 
         searchData.forEach(item => {
-            if (item.content.toLowerCase().includes(input)) {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${item.title}</strong>: ${item.content}`;
-                results.appendChild(li);
-            }
+            item.sections.forEach(section => {
+                const headerMatch = section.header.toLowerCase().includes(input);
+                const contentMatch = section.content.toLowerCase().includes(input);
+
+                if (headerMatch || contentMatch) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${headerMatch ? highlightText(section.header, input) : section.header}</strong>: ${highlightText(section.content, input)}`;
+                    results.appendChild(li);
+                }
+            });
         });
     }
 
