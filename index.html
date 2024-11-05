@@ -14,30 +14,38 @@
             color: #333333;
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center-aligns the content */
         }
 
-        /* Search Bar */
-        input[type="text"] {
-            width: 100%;
+        /* Title Styling */
+        h1 {
+            color: #0071bc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* Container for filter and search */
+        .search-container {
+            width: 25%; /* Set to 1/4 of the width */
+            min-width: 200px; /* Optional: ensure it doesn't shrink too small */
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Search Bar and Dropdown Styling */
+        input[type="text"], select {
+            width: 100%; /* Full width within container */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
             background-color: white;
             color: #333333;
-            margin-bottom: 20px;
-        }
-
-        /* Filter Dropdown */
-        select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: white;
-            color: #333333;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         /* Search Results Container */
@@ -46,13 +54,8 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Title Styling */
-        h1 {
-            color: #0071bc;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            width: 100%; /* Full width for result section */
+            max-width: 800px; /* Optional: limit max width */
         }
 
         /* Result Card */
@@ -70,13 +73,16 @@
 
 <h1>Data Dictionary Documentation</h1>
 
-<select id="filter">
-    <option value="all">All Types</option>
-    <option value="eVar">eVars</option>
-    <option value="Prop">Props</option>
-    <option value="Event">Events</option>
-</select>
-<input type="text" id="search" placeholder="Search documentation...">
+<div class="search-container">
+    <select id="filter">
+        <option value="all">All Types</option>
+        <option value="eVar">eVars</option>
+        <option value="Prop">Props</option>
+        <option value="Event">Events</option>
+    </select>
+    <input type="text" id="search" placeholder="Search documentation...">
+</div>
+
 <div id="results"></div>
 
 <script>
