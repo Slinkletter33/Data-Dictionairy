@@ -60,4 +60,27 @@
             const header = sections[i].trim();
             const body = sections[i + 1].trim();
 
-          
+            if (header.toLowerCase().includes(keyword) || body.toLowerCase().includes(keyword)) {
+                const highlightedHeader = header.replace(new RegExp(`(${keyword})`, 'gi'), '<span class="highlight">$1</span>');
+                const highlightedBody = body.replace(new RegExp(`(${keyword})`, 'gi'), '<span class="highlight">$1</span>');
+                results += `<h2>${highlightedHeader}</h2>${marked(highlightedBody)}`;
+            }
+        }
+
+        // Show results or a message if no matches found
+        const resultsContainer = document.getElementById('results');
+        if (results) {
+            resultsContainer.innerHTML = results;
+        } else {
+            resultsContainer.innerHTML = '<p class="no-results">No results found.</p>';
+        }
+    }
+
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('results').innerHTML = '';
+    }
+</script>
+
+</body>
+</html>
