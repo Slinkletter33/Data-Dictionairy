@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eVars Documentation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script> <!-- Specify version 2.0.3 -->
     <style>
         /* Add some basic styling */
         body { font-family: Arial, sans-serif; margin: 20px; }
@@ -21,7 +21,6 @@
 <div id="results"></div>
 
 <script>
-    // Ensure the Marked library is loaded and available
     window.onload = function() {
         // Step 1: Fetch the Markdown file from the correct raw URL
         fetch('https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md')
@@ -33,7 +32,7 @@
             })
             .then(data => {
                 // Step 2: Convert Markdown to HTML and parse it
-                const html = marked.parse(data);  // Use marked.parse() for the latest versions
+                const html = marked(data); // Use marked() for converting Markdown to HTML
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
 
