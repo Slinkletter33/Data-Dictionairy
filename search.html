@@ -55,6 +55,11 @@
         for (let i = 0; i < sections.length; i += 2) {
             const header = sections[i].trim();
 
+            // Skip the Table of Contents section
+            if (header === "## Table of Contents") {
+                continue;
+            }
+
             // Check if the header matches the search keyword
             if (header.toLowerCase().includes(keyword)) {
                 results += `<h2>${header}</h2>${marked(sections[i + 1].trim())}`;
