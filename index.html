@@ -3,89 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown Search</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>eVars Documentation</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #results { margin-top: 20px; }
-        h2 { margin-bottom: 10px; }
-        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
-        .no-results { color: red; font-weight: bold; }
-        .highlight { background-color: yellow; }
+        body { font-family: Arial, sans-serif; }
+        .search-container { margin-bottom: 20px; }
+        .results { margin-top: 20px; }
+        .result-item { margin: 10px 0; }
     </style>
 </head>
 <body>
+    <h1>eVars (Conversion Variables)</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search eVars..." />
+    </div>
 
-<h1>Search Markdown Documentation</h1>
-<input type="text" id="searchInput" placeholder="Enter keyword..." />
-<button onclick="searchMarkdown()">Search</button>
-<button onclick="clearSearch()">Clear</button>
+    <div id="content"></div>
+    <div class="results" id="results"></div>
 
-<div id="results"></div>
-
-<script>
-    const markdownContent = `
-# eVars (Conversion Variables)
-
-## Table of Contents
-- [eVar1: Product Category](#evar1-product-category)
-- [eVar2: User Type](#evar2-user-type)
-- [eVar3: Campaign Source](#evar3-campaign-source)
-
-## eVar1: Product Category
-- **Description**: Tracks the main category of the product viewed or purchased.
-- **Example Values**: "Electronics", "Clothing"
-- **Page Context**: Product detail pages, checkout pages
-- **Notes**: Consistent across product-related pages.
-
-## eVar2: User Type
-- **Description**: Indicates the type of user (e.g., "New" or "Returning").
-- **Example Values**: "New", "Returning"
-- **Page Context**: All pages
-
-## eVar3: Campaign Source
-- **Description**: Tracks the source of the traffic or campaign.
-- **Example Values**: "Email", "Social Media"
-- **Page Context**: Landing pages
-`;
-
-    function searchMarkdown() {
-        const keyword = document.getElementById('searchInput').value.toLowerCase();
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const searchInput = document.getElementById('search');
         const resultsContainer = document.getElementById('results');
-        
-        // If the search input is empty, show all content
-        if (keyword.trim() === '') {
-            resultsContainer.innerHTML = marked(markdownContent);
-            return;
-        }
+        const content = document.getElementById('content');
 
-        const sections = markdownContent.split(/(## [^\n]+)/).filter(Boolean);
-        let results = '';
+        // Load the Markdown file
+        fetch('evars.md')
+            .then(response => response.text())
+            .then(data => {
+                content.innerHTML = marked(data); // Convert Markdown to HTML
+                
+                // Add search functionality
+                searchInput.addEventListener('input', () => {
+                    const query = searchInput.value.toLowerCase();
+                    resultsContainer.innerHTML = ''; // Clear previous results
 
-        for (let i = 0; i < sections.length; i += 2) {
-            const header = sections[i].trim();
-            const body = sections[i + 1].trim();
-
-            if (header.toLowerCase().includes(keyword) || body.toLowerCase().includes(keyword)) {
-                const highlightedHeader = header.replace(new RegExp(`(${keyword})`, 'gi'), '<span class="highlight">$1</span>');
-                const highlightedBody = body.replace(new RegExp(`(${keyword})`, 'gi'), '<span class="highlight">$1</span>');
-                results += `<h2>${highlightedHeader}</h2>${marked(highlightedBody)}`;
-            }
-        }
-
-        // Show results or a message if no matches found
-        if (results) {
-            resultsContainer.innerHTML = results;
-        } else {
-            resultsContainer.innerHTML = '<p class="no-results">No results found.</p>';
-        }
-    }
-
-    function clearSearch() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('results').innerHTML = '';
-    }
-</script>
-
+                    // Search through the headings and paragraphs
+                    const items = content.querySelectorAll('h2, p');
+                    items.forEach(item => {
+                        if (item.textContent.toLowerCase().includes(query)) {
+                            // Create result item
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('result-item');
+                            resultItem.innerHTML = `<strong>${item.tagName === 'H2' ? item.textContent : ''}</strong><p>${item.tagName === 'P' ? item.textContent : ''}</p>`;
+                            resultsContainer.appendChild(resultItem);
+                        }
+                    });
+                });
+            })
+            .catch(error => console.error('Error loading Markdown file:', error));
+    </script>
 </body>
 </html>
