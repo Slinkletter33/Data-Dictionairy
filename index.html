@@ -21,9 +21,14 @@
 <div id="results"></div>
 
 <script>
-    // Step 1: Fetch the Markdown file
-    fetch('https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/refs/heads/main/eVars.md')
-        .then(response => response.text())
+    // Step 1: Fetch the Markdown file from the correct raw URL
+    fetch('https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
         .then(data => {
             // Step 2: Convert Markdown to HTML and parse it
             const html = marked(data);
