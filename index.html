@@ -8,120 +8,96 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
         /* General Body Styling */
-     /* General Body Styling */
+/* General Body and Background */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f3f8fc; /* Light Blue background */
+    color: #333333; /* Dark text for contrast */
     margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: column;
-    color: #333;
-    height: 100vh;
+    padding: 20px;
 }
 
+/* Search Bar */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px;
+    background-color: white; /* White background */
+    color: #333333; /* Dark text for readability */
+    margin-bottom: 20px;
+}
+
+/* Search Results Container */
+#results {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+/* Title Styling */
 h1 {
-    text-align: center;
-    margin: 20px 0;
-    color: #0056b3;
-    z-index: 1; /* Ensures it stays above other content */
+    color: #0071bc; /* WestJet's dark blue */
+    font-size: 2.5em;
+    margin-bottom: 10px;
 }
 
-/* Fixed Position for Title and Search Bar */
-#search-container {
+/* Search Result Titles */
+h3 {
+    color: #0071bc; /* Matching dark blue for consistency */
+    font-size: 1.5em;
+    margin-top: 10px;
+}
+
+/* Result Content */
+p {
+    font-size: 1em;
+    color: #666; /* Gray for less prominent text */
+}
+
+/* Result Card (for individual results) */
+.result-card {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e1e4e8; /* Light border */
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+}
+
+/* Button Styling (for call-to-action like search) */
+button {
+    background-color: #ff6a13; /* WestJet's accent orange */
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Button Hover Effect */
+button:hover {
+    background-color: #e55d12; /* Darker shade of orange for hover */
+}
+
+/* Fixed Header Styling */
+header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #fff;
+    background-color: #0071bc; /* Dark blue background for header */
     padding: 20px;
-    z-index: 10;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: white;
+    z-index: 1000;
 }
 
-/* Adjust the body to not overflow under the fixed header */
+/* Padding for content to avoid overlap with fixed header */
 body {
-    padding-top: 100px; /* Adjust based on the height of your search bar */
-}
-
-/* Search Bar Styling */
-#search {
-    width: 100%;
-    max-width: 600px;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    outline: none;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#search:focus {
-    border-color: #0056b3;
-}
-
-/* Results Container Styling */
-#results {
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-    max-height: calc(100vh - 160px); /* Adjust height to make results scrollable */
-}
-
-/* Result Cards Styling */
-.result-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Hover Effect on Result Cards */
-.result-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.result-card h3 {
-    font-size: 18px;
-    color: #333;
-    margin: 0;
-    line-height: 1.4;
-}
-
-.result-card p {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #666;
-    margin-top: 10px;
-    flex-grow: 1;
-}
-
-/* Highlight Search Terms */
-.highlight {
-    background-color: #ffcc00;
-    font-weight: bold;
-}
-
-/* No Results Message */
-.no-results {
-    text-align: center;
-    font-size: 18px;
-    color: #888;
+    padding-top: 80px; /* Adjust to prevent overlap */
 }
 
     </style>
