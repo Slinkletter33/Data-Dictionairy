@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adobe Data Dictionairy</title>
+    <title>Adobe Data Dictionary</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
@@ -51,22 +51,46 @@
 
         /* Search Results Container */
         #results {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%; /* Full width for result section */
             max-width: 800px; /* Optional: limit max width */
         }
 
         /* Result Card */
         .result-card {
+            background-color: #e0f7f9; /* Match the color from the first code */
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
+        }
+
+        .result-title {
+            color: #0071bc;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #333333;
+            margin: 10px 0;
+        }
+
+        .pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pill {
             background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #0071bc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -129,7 +153,8 @@
                 // Function to display filtered results based on search query and filter type
                 const displayResults = (query = '', filterType = 'all') => {
                     const resultsContainer = document.getElementById('results');
-                    
+                    resultsContainer.innerHTML = ''; // Clear previous results
+
                     // Filter dataItems based on query and type
                     const filteredItems = dataItems.filter(doc => {
                         const matchesType = filterType === 'all' || doc.type === filterType;
@@ -141,12 +166,22 @@
 
                     // Display results
                     if (filteredItems.length > 0) {
-                        resultsContainer.innerHTML = filteredItems.map(doc => `
-                            <div class="result-card">
-                                <h3>${doc.title}</h3>
-                                <p>${marked(doc.content)}</p>
-                            </div>
-                        `).join('');
+                        filteredItems.forEach(doc => {
+                            const card = document.createElement("div");
+                            card.classList.add("result-card");
+
+                            const title = document.createElement("div");
+                            title.classList.add("result-title");
+                            title.textContent = doc.title;
+                            card.appendChild(title);
+
+                            const description = document.createElement("p");
+                            description.classList.add("description");
+                            description.innerHTML = doc.content; // Use innerHTML to render Markdown
+                            card.appendChild(description);
+
+                            resultsContainer.appendChild(card);
+                        });
                     } else {
                         resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                     }
