@@ -84,7 +84,10 @@
                         q.term(query, { boost: 10 });
                     });
 
-                    const filteredResults = results.map(result => eVars[result.ref]);
+                    // Add a search for numeric values in titles
+                    const numericResults = eVars.filter(doc => doc.title.toLowerCase().includes(query));
+
+                    const filteredResults = [...new Set([...results.map(result => eVars[result.ref]), ...numericResults])];
 
                     if (filteredResults.length > 0) {
                         resultsContainer.innerHTML = filteredResults.map(doc => `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`).join('');
