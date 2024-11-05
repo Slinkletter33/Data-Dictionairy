@@ -8,85 +8,97 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
         /* General Body Styling */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            flex-direction: column;
-            color: #333;
-        }
+       /* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    flex-direction: column;
+    color: #333;
+}
 
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-            color: #0056b3;
-        }
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    color: #0056b3;
+}
 
-        #search {
-            width: 100%;
-            max-width: 600px;
-            padding: 10px;
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            outline: none;
-        }
+#search {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+}
 
-        #search:focus {
-            border-color: #0056b3;
-        }
+#search:focus {
+    border-color: #0056b3;
+}
 
-        #results {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+#results {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-        .result-card {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+/* Result Cards Styling */
+.result-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    min-height: 120px; /* Ensures a consistent height for each result card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
+/* Hover Effect on Result Cards */
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
 
-        .result-card h3 {
-            font-size: 18px;
-            color: #333;
-            margin: 0;
-        }
+.result-card h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+}
 
-        .result-card p {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #666;
-            margin-top: 10px;
-        }
+.result-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin-top: 10px;
+    flex-grow: 1;  /* Allows the paragraph to expand and fill available space */
+}
 
-        .highlight {
-            background-color: #ffcc00;
-            font-weight: bold;
-        }
+/* Highlight Search Terms */
+.highlight {
+    background-color: #ffcc00;
+    font-weight: bold;
+}
 
-        .no-results {
-            text-align: center;
-            font-size: 18px;
-            color: #888;
-        }
+/* No Results Message */
+.no-results {
+    text-align: center;
+    font-size: 18px;
+    color: #888;
+}
+
 
     </style>
 </head>
