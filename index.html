@@ -8,48 +8,73 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
         /* General Body Styling */
-       /* General Body Styling */
+     /* General Body Styling */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    justify-content: flex-start;
     flex-direction: column;
     color: #333;
+    height: 100vh;
 }
 
 h1 {
     text-align: center;
     margin: 20px 0;
     color: #0056b3;
+    z-index: 1; /* Ensures it stays above other content */
 }
 
+/* Fixed Position for Title and Search Bar */
+#search-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust the body to not overflow under the fixed header */
+body {
+    padding-top: 100px; /* Adjust based on the height of your search bar */
+}
+
+/* Search Bar Styling */
 #search {
     width: 100%;
     max-width: 600px;
     padding: 10px;
-    margin: 20px 0;
+    margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
     outline: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #search:focus {
     border-color: #0056b3;
 }
 
+/* Results Container Styling */
 #results {
     width: 100%;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 20px auto;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 160px); /* Adjust height to make results scrollable */
 }
 
 /* Result Cards Styling */
@@ -59,7 +84,7 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    min-height: 120px; /* Ensures a consistent height for each result card */
+    min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -83,7 +108,7 @@ h1 {
     line-height: 1.6;
     color: #666;
     margin-top: 10px;
-    flex-grow: 1;  /* Allows the paragraph to expand and fill available space */
+    flex-grow: 1;
 }
 
 /* Highlight Search Terms */
@@ -98,7 +123,6 @@ h1 {
     font-size: 18px;
     color: #888;
 }
-
 
     </style>
 </head>
