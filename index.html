@@ -134,7 +134,7 @@ body {
             sections.forEach(section => {
                 const title = section.innerText;
                 const content = section.nextElementSibling?.innerHTML || '';
-                eVars.push( ${title}`, content, type: source.type });
+                eVars.push({ title: `${source.type}: ${title}`, content, type: source.type });
             });
         };
 
@@ -142,7 +142,6 @@ body {
         Promise.all(sources.map(fetchAndProcess))
             .then(() => {
                 const index = lunr(function () {
-                    this.field('title');
                     this.field('content');
                     eVars.forEach((doc, id) => {
                         this.add({ id: id, ...doc });
