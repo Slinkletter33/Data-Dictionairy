@@ -70,7 +70,7 @@
 
                 // Step 5: Implement the search functionality
                 document.getElementById('search').addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase();
+                    const query = this.value.trim().toLowerCase().replace(/\s+/g, ''); // Normalize query
                     const resultsContainer = document.getElementById('results');
 
                     if (!query) {
@@ -79,6 +79,7 @@
                         return;
                     }
 
+                    // Search the index with normalized query
                     const results = index.query(function (q) {
                         q.term(query, { boost: 10 });
                     });
@@ -88,7 +89,7 @@
                     if (filteredResults.length > 0) {
                         resultsContainer.innerHTML = filteredResults.map(doc => `<h3>${doc.title}</h3><div>${marked(doc.content)}</div>`).join('');
                     } else {
-                        resultsContainer.innerHTML = `<p>No results found for "${query}".</p>`;
+                        resultsContainer.innerHTML = `<p>No results found for "${this.value}".</p>`;
                     }
                 });
             })
