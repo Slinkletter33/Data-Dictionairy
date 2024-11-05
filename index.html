@@ -7,68 +7,61 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
-        /* General Body Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f8fc;
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center-aligns the content */
-        }
+       /* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f8fc;
+    color: #333333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center-aligns the content */
+}
 
-        /* Title Styling */
-        h1 {
-            color: #0071bc;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+/* Title Styling */
+h1 {
+    color: #0071bc;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
 
-        /* Container for filter and search */
-        .search-container {
-            width: 25%; /* Set to 1/4 of the width */
-            min-width: 200px; /* Optional: ensure it doesn't shrink too small */
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-        }
+/* Container for filter and search */
+.search-container {
+    width: 25%; /* Set to 1/4 of the width */
+    min-width: 200px; /* Optional: ensure it doesn't shrink too small */
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
 
-        /* Search Bar and Dropdown Styling */
-        input[type="text"], select {
-            width: 100%; /* Full width within container */
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: white;
-            color: #333333;
-            margin-bottom: 10px;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
-        }
+/* Search Bar and Dropdown Styling */
+input[type="text"], select {
+    width: 100%; /* Full width within container */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #333333;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
 
-        /* Search Results Container */
-        #results {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Full width for result section */
-            max-width: 800px; /* Optional: limit max width */
-        }
+/* Search Results Container */
+#results {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width for result section */
+    max-width: 800px; /* Optional: limit max width */
+}
 
-        /* Result Card */
-        .result-card {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-
-            .result-card {
+/* Result Card */
+.result-card {
+    margin-bottom: 20px;
     padding: 15px;
     border: 1px solid #e1e4e8;
     border-radius: 8px;
@@ -77,10 +70,12 @@
     transition: background-color 0.3s ease;
 }
 
+/* Highlight active items with a different color */
 .result-card.active {
-    background-color: #ffecb3; /* Light yellow color for repurposed items */
+    background-color: #ffecb3; /* Light yellow color for active items */
     border-color: #ff9800; /* Orange border for emphasis */
 }
+
 
         }
     </style>
