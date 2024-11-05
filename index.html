@@ -67,13 +67,6 @@ input[type="text"], select {
     border-radius: 8px;
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease;
-}
-
-/* Highlight active items with a different color */
-.result-card.active {
-    background-color: #ffecb3; /* Light yellow color for active items */
-    border-color: #ff9800; /* Orange border for emphasis */
 }
 
 /* Highlight inactive items */
@@ -160,12 +153,15 @@ window.onload = function() {
 
                 // Display results
                 if (filteredItems.length > 0) {
-                    resultsContainer.innerHTML = filteredItems.map(doc => `
-                        <div class="result-card ${doc.status === 'active' ? 'active' : 'inactive'}">
-                            <h3>${doc.title}</h3>
-                            <p>${marked(doc.content)}</p>
-                        </div>
-                    `).join('');
+                    resultsContainer.innerHTML = filteredItems.map(doc => {
+                        const inactiveClass = doc.status === 'inactive' ? 'inactive' : '';
+                        return `
+                            <div class="result-card ${inactiveClass}">
+                                <h3>${doc.title}</h3>
+                                <p>${marked(doc.content)}</p>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
                     resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                 }
