@@ -18,6 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
 }
 
 /* Title Styling */
@@ -31,7 +32,7 @@ h1 {
 /* Container for filter and search */
 .search-container {
     width: 100%;
-    min-width: 200px;
+    max-width: 600px;
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -41,6 +42,7 @@ h1 {
 /* Search Bar and Dropdown Styling */
 input[type="text"], select {
     width: 100%;
+    max-width: 400px;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -53,26 +55,27 @@ input[type="text"], select {
 
 /* Result Cards */
 .result-card {
-    width: 900px; /* Fixed width for all result cards */
-    margin: 0 auto 20px; /* Centers the cards and adds bottom margin */
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 20px;
     padding: 15px;
     border: 1px solid #e1e4e8;
     border-radius: 8px;
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    box-sizing: border-box;
 }
 
 /* Card Header */
 .card-header {
-    width: 100%; /* Ensure header spans full width of the card */
+    width: 100%;
     padding: 10px 15px;
     background-color: #00203E;
     color: white;
     font-size: 1.2em;
     font-weight: bold;
     border-radius: 8px 8px 0 0;
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    box-sizing: border-box;
 }
 
 /* Result Fields */
@@ -91,6 +94,7 @@ input[type="text"], select {
     border-radius: 20px;
     font-weight: bold;
     margin-right: 10px;
+    white-space: nowrap;
 }
 
 /* Styling for the result text next to the pill */
@@ -112,21 +116,28 @@ input[type="text"], select {
     font-size: 1.2em;
 }
 
-/* Responsive Search Container */
+/* Responsive Design */
 @media (max-width: 1024px) {
     .search-container {
-        width: 50%; /* Adjust width for smaller screens */
+        width: 50%;
     }
 }
 
 @media (max-width: 768px) {
     .result-card {
-        width: 100%; /* Full width on smaller screens */
+        width: 100%;
     }
     .search-container {
-        width: 80%; /* Wider search container on very small screens */
+        width: 80%;
     }
 }
+
+@media (max-width: 480px) {
+    .search-container {
+        width: 90%;
+    }
+}
+
 
 
     </style>
