@@ -49,16 +49,6 @@
             box-sizing: border-box;
         }
 
-        /* Search Results Container */
-        #results {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-        }
-
         /* Result Card */
         .result-card {
             margin-bottom: 20px;
@@ -69,13 +59,44 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        .status-badge {
+        /* Pill Styling for field names */
+        .pill {
+            display: inline-block;
             background-color: #0071bc;
             color: white;
-            padding: 5px;
-            border-radius: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 10px;
         }
 
+        /* Styling for the result text next to the pill */
+        .result {
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        /* Additional styling for the result container */
+        .card-content {
+            margin-top: 10px;
+        }
+
+        .card-field {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-field .pill {
+            margin-right: 10px;
+        }
+
+        .card-field .result {
+            flex: 1;
+        }
+
+        /* No results message styling */
         .no-results {
             color: #ff0000;
             font-size: 1.2em;
@@ -198,15 +219,43 @@
                             let cardContent = `
                                 <div class="result-card">
                                     <h3>${title}</h3>
-                                    <ul>
-                                        ${isValidField(description) ? `<li><strong>Description</strong>: ${description}</li>` : ''}
-                                        ${isValidField(exampleValues) ? `<li><strong>Example Values</strong>: ${exampleValues}</li>` : ''}
-                                        ${isValidField(pageContext) ? `<li><strong>Page Context</strong>: ${pageContext}</li>` : ''}
-                                        ${isValidField(notes) ? `<li><strong>Notes</strong>: ${notes}</li>` : ''}
-                                        ${isValidField(exceptions) ? `<li><strong>Exceptions</strong>: ${exceptions}</li>` : ''}
-                                        ${isValidField(status) ? `<li><strong>Status</strong>: ${status}</li>` : ''}
-                                        ${isValidField(tags) ? `<li><strong>Tags</strong>: ${tags}</li>` : ''}
-                                    </ul>
+                                    <div class="card-content">
+                                        ${isValidField(description) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Description:</div>
+                                                <div class="result">${description}</div>
+                                            </div>` : ''}
+                                        ${isValidField(exampleValues) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Example Values:</div>
+                                                <div class="result">${exampleValues}</div>
+                                            </div>` : ''}
+                                        ${isValidField(pageContext) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Page Context:</div>
+                                                <div class="result">${pageContext}</div>
+                                            </div>` : ''}
+                                        ${isValidField(notes) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Notes:</div>
+                                                <div class="result">${notes}</div>
+                                            </div>` : ''}
+                                        ${isValidField(exceptions) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Exceptions:</div>
+                                                <div class="result">${exceptions}</div>
+                                            </div>` : ''}
+                                        ${isValidField(status) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Status:</div>
+                                                <div class="result">${status}</div>
+                                            </div>` : ''}
+                                        ${isValidField(tags) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Tags:</div>
+                                                <div class="result">${tags}</div>
+                                            </div>` : ''}
+                                    </div>
                                 </div>`;
                             return cardContent;
                         }).join('');
