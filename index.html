@@ -51,12 +51,24 @@
 
         /* Result Card */
         .result-card {
+            width: 75%;
+            max-width: 1000px;
             margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #e1e4e8;
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Header inside each card */
+        .card-header {
+            background-color: #0071bc;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.2em;
+            font-weight: bold;
         }
 
         /* Pill Styling for field names */
@@ -218,7 +230,7 @@
                             const { title, description, exampleValues, pageContext, notes, exceptions, status, tags } = doc;
                             let cardContent = `
                                 <div class="result-card">
-                                    <h3>${title}</h3>
+                                    <div class="card-header">${title}</div>
                                     <div class="card-content">
                                         ${isValidField(description) ? `
                                             <div class="card-field">
