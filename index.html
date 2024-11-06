@@ -130,13 +130,20 @@
                 notes: /- \*\*Notes\*\*: (.*)/,
                 exceptions: /- \*\*Exceptions\*\*: (.*)/,
                 status: /- \*\*Status\*\*: (.*)/,
-                tags: /- \*\*Tags\*\*: (.*)/
+                tags: /- \*\*Tags\*\*: (.*)/,
+                title: /## (.*)\n/ // Match the variable name (h2 -> ##)
             };
 
+            // Extract the title (variable name)
+            const titleMatch = markdownContent.match(patterns.title);
+            if (titleMatch) data.title = titleMatch[1].trim(); // Extract the variable name
+
             Object.keys(patterns).forEach(key => {
-                const match = markdownContent.match(patterns[key]);
-                if (match && match[1] && isValidField(match[1])) {
-                    data[key] = match[1].trim();
+                if (key !== 'title') { // Skip the title key for now
+                    const match = markdownContent.match(patterns[key]);
+                    if (match && match[1] && isValidField(match[1])) {
+                        data[key] = match[1].trim();
+                    }
                 }
             });
 
@@ -162,6 +169,7 @@
                     this.field('exceptions');
                     this.field('status');
                     this.field('tags');
+                    this.field('title'); // Include title (variable name) in the search index
                     dataItems.forEach((doc, id) => {
                         this.add({ id: id, ...doc });
                     });
@@ -181,11 +189,12 @@
 
                     if (filteredItems.length > 0) {
                         resultsContainer.innerHTML = filteredItems.map(doc => {
-                            const { description, exampleValues, pageContext, notes, exceptions, status, tags } = doc;
+                            const { title, description, exampleValues, pageContext, notes, exceptions, status, tags } = doc;
                             let cardContent = `
                                 <div class="result-card">
-                                    <h3>${description}</h3>
+                                    <h3>${title}</h3>
                                     <ul>
+                                        ${isValidField(description) ? `<li><strong>Description</strong>: ${description}</li>` : ''}
                                         ${isValidField(exampleValues) ? `<li><strong>Example Values</strong>: ${exampleValues}</li>` : ''}
                                         ${isValidField(pageContext) ? `<li><strong>Page Context</strong>: ${pageContext}</li>` : ''}
                                         ${isValidField(notes) ? `<li><strong>Notes</strong>: ${notes}</li>` : ''}
