@@ -62,13 +62,15 @@
 
 
         /* Header inside each card */
-        .card-header {
+               .card-header {
+            width: 100%; /* Make header the same width as the card */
+            padding: 10px 15px;
             background-color: #0071bc;
             color: white;
-            padding: 10px 15px;
-            border-radius: 8px 8px 0 0;
             font-size: 1.2em;
             font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
         }
 
         /* Pill Styling for field names */
