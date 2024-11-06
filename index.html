@@ -18,7 +18,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
 }
 
 /* Title Styling */
@@ -32,7 +31,7 @@ h1 {
 /* Container for filter and search */
 .search-container {
     width: 100%;
-    max-width: 600px;
+    min-width: 200px;
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -42,7 +41,6 @@ h1 {
 /* Search Bar and Dropdown Styling */
 input[type="text"], select {
     width: 100%;
-    max-width: 400px;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -57,24 +55,29 @@ input[type="text"], select {
 .result-card {
     width: 900px;
     margin: 0 auto 20px;
-    padding: 15px 0 15px 0; /* Remove left and right padding */
+    padding: 0; /* Remove all padding from the card */
     border: 1px solid #e1e4e8;
     border-radius: 8px;
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    box-sizing: border-box;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
 
 /* Card Header */
 .card-header {
     width: 100%;
-    padding: 10px 15px;
+    padding: 10px 15px; /* Add padding to the header for internal spacing */
     background-color: #00203E;
     color: white;
     font-size: 1.2em;
     font-weight: bold;
     border-radius: 8px 8px 0 0;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+/* Card Content */
+.card-content {
+    padding: 10px 15px; /* Add padding inside the content area */
 }
 
 /* Result Fields */
@@ -93,7 +96,6 @@ input[type="text"], select {
     border-radius: 20px;
     font-weight: bold;
     margin-right: 10px;
-    white-space: nowrap;
 }
 
 /* Styling for the result text next to the pill */
@@ -104,38 +106,28 @@ input[type="text"], select {
     flex: 1;
 }
 
-/* Additional styling for the result container */
-.card-content {
-    margin-top: 10px;
-}
-
 /* No results message styling */
 .no-results {
     color: #ff0000;
     font-size: 1.2em;
 }
 
-/* Responsive Design */
+/* Responsive Search Container */
 @media (max-width: 1024px) {
     .search-container {
-        width: 50%;
+        width: 50%; /* Adjust width for smaller screens */
     }
 }
 
 @media (max-width: 768px) {
     .result-card {
-        width: 100%;
+        width: 100%; /* Full width on smaller screens */
     }
     .search-container {
-        width: 80%;
+        width: 80%; /* Wider search container on very small screens */
     }
 }
 
-@media (max-width: 480px) {
-    .search-container {
-        width: 90%;
-    }
-}
 
 
 
