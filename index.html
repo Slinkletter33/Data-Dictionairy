@@ -116,16 +116,16 @@
                 console.log(`Processing section: ${title}`);
                 console.log(`Content: ${content}`);
 
-                // Extract status from the content anywhere
-                const statusMatch = content.match(/Status:\s*(\w+)/);
-                const status = statusMatch ? statusMatch[1].toLowerCase() : 'unknown'; // Default to 'unknown' if not found
+                // Extract the status from the content (looking for the <li> with Status)
+                const statusMatch = content.match(/<li><strong>Status<\/strong>:?\s*([\w\s]+)/);
+                const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'unknown'; // Default to 'unknown' if not found
 
                 // Log the status extraction to see if it works
                 console.log(`Extracted status for ${title}: ${status}`);
 
-                // Check if the status is "inactive"
-                if (status === 'inactive') {
-                    console.log(`Found inactive result: ${title}`);
+                // Check if the status is "inactive" or "archived"
+                if (status === 'inactive' || status === 'archived') {
+                    console.log(`Found ${status} result: ${title}`);
                 }
 
                 dataItems.push({
