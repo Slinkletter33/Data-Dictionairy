@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adobe Data Dictionairy</title>
+    <title>Adobe Data Dictionary</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
@@ -16,7 +16,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center-aligns the content */
+            align-items: center;
         }
 
         /* Title Styling */
@@ -34,10 +34,11 @@
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
+            align-items: flex-start; /* Align items to start */
         }
 
-        /* Search Bar and Dropdown Styling */
-        input[type="text"], select {
+        /* Search Bar and Tag Styling */
+        input[type="text"] {
             width: 100%; /* Full width within container */
             padding: 10px;
             font-size: 16px;
@@ -47,6 +48,26 @@
             color: #333333;
             margin-bottom: 10px;
             box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+
+        /* Tag (Pill) Styling */
+        .tag {
+            display: inline-block;
+            background-color: #0071bc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tag:hover {
+            background-color: #005f9e;
+        }
+
+        .selected {
+            background-color: #005f9e;
         }
 
         /* Search Results Container */
@@ -68,6 +89,35 @@
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
+
+        /* Style for archived items */
+        .archived-status {
+            background-color: #f2f2f2;
+            border-left: 4px solid #d1d1d1;
+            opacity: 0.6;
+        }
+
+        /* Style for active items */
+        .active-status {
+            background-color: #e0ffe0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        /* Style for sessions tag (for highlighted tag formatting) */
+        .highlight-sessions {
+            background-color: #0071bc;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        /* Highlight search term */
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+            color: #333;
+        }
+
     </style>
 </head>
 <body>
@@ -75,13 +125,13 @@
 <h1>Adobe Data Dictionary</h1>
 
 <div class="search-container">
-    <select id="filter">
-        <option value="all">All Types</option>
-        <option value="eVar">eVars</option>
-        <option value="Prop">Props</option>
-        <option value="Event">Events</option>
-    </select>
     <input type="text" id="search" placeholder="Search the Data...">
+    <div id="tags">
+        <span class="tag" data-type="all">All Types</span>
+        <span class="tag" data-type="eVar">eVars</span>
+        <span class="tag" data-type="Prop">Props</span>
+        <span class="tag" data-type="Event">Events</span>
+    </div>
 </div>
 
 <div id="results"></div>
@@ -111,7 +161,12 @@
             sections.forEach(section => {
                 const title = section.innerText;
                 const content = section.nextElementSibling?.innerHTML || '';
-                dataItems.push({ title, content, type: source.type });
+                
+                // Extract attributes (for dynamic formatting)
+                const status = content.includes("archived") ? "archived" : "active"; // Example logic for status
+                const tags = content.match(/Tags:\s*([\w, ]+)/)?.[1].split(', ') || []; // Example logic for tags
+                
+                dataItems.push({ title, content, type: source.type, status, tags });
             });
         };
 
@@ -139,14 +194,28 @@
                         return matchesType && matchesQuery;
                     });
 
-                    // Display results
+                    // Display results with dynamic formatting based on status and tags
                     if (filteredItems.length > 0) {
-                        resultsContainer.innerHTML = filteredItems.map(doc => `
-                            <div class="result-card">
-                                <h3>${doc.title}</h3>
-                                <p>${marked(doc.content)}</p>
-                            </div>
-                        `).join('');
+                        resultsContainer.innerHTML = filteredItems.map(doc => {
+                            // Format based on status
+                            const statusClass = doc.status === 'archived' ? 'archived-status' : 'active-status';
+
+                            // Format based on tags
+                            const tagClass = doc.tags.includes('sessions') ? 'highlight-sessions' : '';
+
+                            // Highlight search terms
+                            const highlightedTitle = doc.title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+                            const highlightedContent = doc.content.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+
+                            return `
+                                <div class="result-card ${statusClass} ${tagClass}">
+                                    <h3>${highlightedTitle}</h3>
+                                    <p><strong>Description:</strong> ${doc.content}</p>
+                                    <p><strong>Tags:</strong> ${doc.tags.join(', ')}</p>
+                                    <p><strong>Status:</strong> ${doc.status}</p>
+                                </div>
+                            `;
+                        }).join('');
                     } else {
                         resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                     }
@@ -155,22 +224,28 @@
                 // Event listener for search input
                 document.getElementById('search').addEventListener('input', function() {
                     const query = this.value.trim().toLowerCase();
-                    const filterType = document.getElementById('filter').value;
+                    const filterType = document.querySelector('.selected')?.dataset.type || 'all';
                     displayResults(query, filterType);
                 });
 
-                // Event listener for filter dropdown
-                document.getElementById('filter').addEventListener('change', function() {
-                    const filterType = this.value;
-                    const query = document.getElementById('search').value.trim().toLowerCase();
-                    displayResults(query, filterType);
+                // Event listener for tag filters
+                document.querySelectorAll('.tag').forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        // Toggle selected class
+                        document.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+                        tag.classList.add('selected');
+
+                        // Trigger results update based on selected tag
+                        const query = document.getElementById('search').value.trim().toLowerCase();
+                        displayResults(query, tag.dataset.type);
+                    });
                 });
 
-                // Initial display of all items
+                // Initial display
                 displayResults();
             })
-            .catch(error => console.error('Error fetching Markdown files:', error));
-    };
+            .catch(console.error);
+    }
 </script>
 
 </body>
