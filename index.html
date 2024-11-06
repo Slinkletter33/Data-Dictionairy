@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center-aligns the content */
+            align-items: center;
         }
 
         /* Title Styling */
@@ -29,16 +30,17 @@
 
         /* Container for filter and search */
         .search-container {
-            width: 25%; /* Set to 1/4 of the width */
-            min-width: 200px; /* Optional: ensure it doesn't shrink too small */
+            width: 25%;
+            min-width: 200px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
         }
 
         /* Search Bar and Dropdown Styling */
-        input[type="text"], select {
-            width: 100%; /* Full width within container */
+        input[type="text"],
+        select {
+            width: 100%;
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -46,7 +48,7 @@
             background-color: white;
             color: #333333;
             margin-bottom: 10px;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            box-sizing: border-box;
         }
 
         /* Search Results Container */
@@ -55,8 +57,8 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Full width for result section */
-            max-width: 800px; /* Optional: limit max width */
+            width: 100%;
+            max-width: 800px;
         }
 
         /* Result Card */
@@ -69,110 +71,114 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        /* Status Badge */
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.9em;
-            color: white;
-            background-color: #f44336; /* Red for inactive */
-        }
-
-        .status-active {
-            background-color: #4CAF50; /* Green for active */
-        }
-
-        .status-archived {
-            background-color: #FF9800; /* Orange for archived */
+        .no-results {
+            color: #ff0000;
+            text-align: center;
         }
     </style>
 </head>
+
 <body>
 
-<h1>Adobe Data Dictionary</h1>
+    <h1>Adobe Data Dictionary</h1>
 
-<div class="search-container">
-    <select id="filter">
-        <option value="all">All Types</option>
-        <option value="eVar">eVars</option>
-        <option value="Prop">Props</option>
-        <option value="Event">Events</option>
-    </select>
-    <input type="text" id="search" placeholder="Search the Data...">
-</div>
+    <div class="search-container">
+        <select id="filter">
+            <option value="all">All Types</option>
+            <option value="eVar">eVars</option>
+            <option value="Prop">Props</option>
+            <option value="Event">Events</option>
+        </select>
+        <input type="text" id="search" placeholder="Search the Data...">
+    </div>
 
-<div id="results"></div>
+    <div id="results"></div>
 
-<script>
-  // Function to check if the content should be displayed (not empty, "N/A", or "None")
-const isValidField = (value) => {
-    return value && value.trim() !== 'N/A' && value.trim() !== 'None' && value.trim() !== '';
-};
+    <script>
+        window.onload = async function () {
+            const sources = [
+                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
+                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
+                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+            ];
 
-const displayResults = (query = '', filterType = 'all') => {
-    const resultsContainer = document.getElementById('results');
+            const dataItems = [];
 
-    // Filter dataItems based on query and type
-    const filteredItems = dataItems.filter(doc => {
-        const matchesType = filterType === 'all' || doc.type === filterType;
-        const matchesQuery = query ? 
-            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) : 
-            true;
-        return matchesType && matchesQuery;
-    });
+            // Fetch and process each Markdown file
+            const fetchAndProcess = async (source) => {
+                const response = await fetch(source.url);
+                if (!response.ok) throw new Error(`Error fetching ${source.url}`);
 
-    // Display results
-    if (filteredItems.length > 0) {
-        resultsContainer.innerHTML = filteredItems.map(doc => {
-            // Only show the status if it's not 'inactive'
-            const statusBadge = doc.status !== 'inactive' ? `<span class="status-badge status-${doc.status.toLowerCase()}">${doc.status}</span>` : '';
+                const data = await response.text();
+                const html = marked(data);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
 
-            // Build the result content dynamically based on valid fields
-            let resultContent = '';
+                // Extract relevant sections
+                const sections = doc.querySelectorAll('h2');
+                sections.forEach(section => {
+                    const title = section.innerText;
+                    const content = section.nextElementSibling?.innerHTML || '';
+                    dataItems.push({ title, content, type: source.type });
+                });
+            };
 
-            // Check if fields are valid (not N/A, None, or empty) before displaying
-            if (isValidField(doc.content)) {
-                resultContent += `<li><strong>Description</strong>: ${doc.content}</li>`;
+            // Fetch all sources and initialize the search index
+            try {
+                await Promise.all(sources.map(fetchAndProcess));
+                const index = lunr(function () {
+                    this.field('title');
+                    this.field('content');
+                    dataItems.forEach((doc, id) => {
+                        this.add({ id: id, ...doc });
+                    });
+                });
+
+                // Display filtered results
+                const displayResults = (query = '', filterType = 'all') => {
+                    const resultsContainer = document.getElementById('results');
+                    const filteredItems = dataItems.filter(doc => {
+                        const matchesType = filterType === 'all' || doc.type === filterType;
+                        const matchesQuery = query ?
+                            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) :
+                            true;
+                        return matchesType && matchesQuery;
+                    });
+
+                    // Display results
+                    if (filteredItems.length > 0) {
+                        resultsContainer.innerHTML = filteredItems.map(doc => `
+                            <div class="result-card">
+                                <h3>${doc.title}</h3>
+                                <p>${marked(doc.content)}</p>
+                            </div>
+                        `).join('');
+                    } else {
+                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
+                    }
+                };
+
+                // Event listeners for search input and filter dropdown
+                document.getElementById('search').addEventListener('input', function () {
+                    const query = this.value.trim().toLowerCase();
+                    const filterType = document.getElementById('filter').value;
+                    displayResults(query, filterType);
+                });
+
+                document.getElementById('filter').addEventListener('change', function () {
+                    const filterType = this.value;
+                    const query = document.getElementById('search').value.trim().toLowerCase();
+                    displayResults(query, filterType);
+                });
+
+                // Initial display of all items
+                displayResults();
+            } catch (error) {
+                console.error('Error fetching Markdown files:', error);
             }
-            const exampleValues = 'mobile'; // Replace this with dynamic value
-            if (isValidField(exampleValues)) {
-                resultContent += `<li><strong>Example Values</strong>: ${exampleValues}</li>`;
-            }
-
-            const pageContext = '[Specify page context]'; // Replace with dynamic value
-            if (isValidField(pageContext)) {
-                resultContent += `<li><strong>Page Context</strong>: ${pageContext}</li>`;
-            }
-
-            const notes = 'Event type description'; // Replace with dynamic value
-            if (isValidField(notes)) {
-                resultContent += `<li><strong>Notes</strong>: ${notes}</li>`;
-            }
-
-            const exceptions = 'N/A'; // Replace with dynamic value
-            if (isValidField(exceptions)) {
-                resultContent += `<li><strong>Exceptions</strong>: ${exceptions}</li>`;
-            }
-
-            const tags = 'marketing'; // Replace with dynamic value
-            if (isValidField(tags)) {
-                resultContent += `<li><strong>Tags</strong>: ${tags}</li>`;
-            }
-
-            return `
-                <div class="result-card">
-                    <h3>${doc.title}</h3>
-                    ${statusBadge}
-                    <ul>${resultContent}</ul>
-                </div>
-            `;
-        }).join('');
-    } else {
-        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
-    }
-};
-
-</script>
+        };
+    </script>
 
 </body>
+
 </html>
