@@ -99,7 +99,6 @@
 <div id="results"></div>
 
 <script>
-   
     window.onload = async function() {
         const sources = [
             { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
@@ -200,7 +199,7 @@
                                         ${isValidField(pageContext) ? `<li><strong>Page Context</strong>: ${pageContext}</li>` : ''}
                                         ${isValidField(notes) ? `<li><strong>Notes</strong>: ${notes}</li>` : ''}
                                         ${isValidField(exceptions) ? `<li><strong>Exceptions</strong>: ${exceptions}</li>` : ''}
-                                        ${isValidField(status) && status !== 'inactive' ? `<li><strong>Status</strong>: ${status}</li>` : ''}
+                                        ${status && status !== 'inactive' ? `<li><strong>Status</strong>: ${status}</li>` : ''}
                                         ${isValidField(tags) ? `<li><strong>Tags</strong>: ${tags}</li>` : ''}
                                     </ul>
                                 </div>`;
@@ -229,9 +228,8 @@
             })
             .catch(error => console.error('Error fetching Markdown files:', error));
     };
-
-
 </script>
+
 
 </body>
 </html>
