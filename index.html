@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +16,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: center; /* Center-aligns the content */
         }
 
         /* Title Styling */
@@ -30,17 +29,16 @@
 
         /* Container for filter and search */
         .search-container {
-            width: 25%;
-            min-width: 200px;
+            width: 25%; /* Set to 1/4 of the width */
+            min-width: 200px; /* Optional: ensure it doesn't shrink too small */
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
         }
 
         /* Search Bar and Dropdown Styling */
-        input[type="text"],
-        select {
-            width: 100%;
+        input[type="text"], select {
+            width: 100%; /* Full width within container */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -48,7 +46,7 @@
             background-color: white;
             color: #333333;
             margin-bottom: 10px;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
         }
 
         /* Search Results Container */
@@ -57,8 +55,8 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
+            width: 100%; /* Full width for result section */
+            max-width: 800px; /* Optional: limit max width */
         }
 
         /* Result Card */
@@ -70,79 +68,92 @@
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-
-        .no-results {
-            color: #ff0000;
-            text-align: center;
-        }
     </style>
 </head>
-
 <body>
 
-    <h1>Adobe Data Dictionary</h1>
+<h1>Adobe Data Dictionary</h1>
 
-    <div class="search-container">
-        <select id="filter">
-            <option value="all">All Types</option>
-            <option value="eVar">eVars</option>
-            <option value="Prop">Props</option>
-            <option value="Event">Events</option>
-        </select>
-        <input type="text" id="search" placeholder="Search the Data...">
-    </div>
+<div class="search-container">
+    <select id="filter">
+        <option value="all">All Types</option>
+        <option value="eVar">eVars</option>
+        <option value="Prop">Props</option>
+        <option value="Event">Events</option>
+    </select>
+    <input type="text" id="search" placeholder="Search the Data...">
+</div>
 
-    <div id="results"></div>
+<div id="results"></div>
 
-    <script>
-        window.onload = async function () {
-            const sources = [
-                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
-                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
-                { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
-            ];
+<script>
+    window.onload = function() {
+        const sources = [
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
+            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+        ];
+        
+        const dataItems = []; // Combined array for all items
 
-            const dataItems = [];
+        // Function to fetch, parse, and process each Markdown file
+        const fetchAndProcess = async (source) => {
+            const response = await fetch(source.url);
+            if (!response.ok) throw new Error(`Error fetching ${source.url}`);
+            
+            const data = await response.text();
+            const html = marked(data);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract relevant sections (assuming `h2` as headers)
+            const sections = doc.querySelectorAll('h2');
+            sections.forEach(section => {
+                const title = section.innerText;
+                const content = section.nextElementSibling?.innerHTML || '';
 
-            // Fetch and process each Markdown file
-            const fetchAndProcess = async (source) => {
-                const response = await fetch(source.url);
-                if (!response.ok) throw new Error(`Error fetching ${source.url}`);
+                // Extract status from the content anywhere
+                const statusMatch = content.match(/Status:\s*(\w+)/);
+                const status = statusMatch ? statusMatch[1].toLowerCase() : 'unknown'; // Default to 'unknown' if not found
 
-                const data = await response.text();
-                const html = marked(data);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+                // Check if the status is "inactive"
+                if (status === 'inactive') {
+                    // Do something with the inactive result (e.g., log it or style it)
+                    console.log(`Found inactive result: ${title}`);
+                }
 
-                // Extract relevant sections
-                const sections = doc.querySelectorAll('h2');
-                sections.forEach(section => {
-                    const title = section.innerText;
-                    const content = section.nextElementSibling?.innerHTML || '';
-                    dataItems.push({ title, content, type: source.type });
+                dataItems.push({
+                    title,
+                    content,
+                    type: source.type,
+                    status
                 });
-            };
+            });
+        };
 
-            // Fetch all sources and initialize the search index
-            try {
-                await Promise.all(sources.map(fetchAndProcess));
+        // Fetch all sources and then initialize the search index
+        Promise.all(sources.map(fetchAndProcess))
+            .then(() => {
                 const index = lunr(function () {
                     this.field('title');
                     this.field('content');
                     dataItems.forEach((doc, id) => {
                         this.add({ id: id, ...doc });
-                    });
+                    }, this);
                 });
 
-                // Display filtered results
+                // Function to display filtered results based on search query and filter type
                 const displayResults = (query = '', filterType = 'all') => {
                     const resultsContainer = document.getElementById('results');
+                    
+                    // Filter dataItems based on query, type, and status
                     const filteredItems = dataItems.filter(doc => {
                         const matchesType = filterType === 'all' || doc.type === filterType;
-                        const matchesQuery = query ?
-                            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) :
+                        const matchesQuery = query ? 
+                            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) : 
                             true;
-                        return matchesType && matchesQuery;
+                        const matchesStatus = doc.status === 'inactive'; // Filter for inactive status
+                        return matchesType && matchesQuery && matchesStatus;
                     });
 
                     // Display results
@@ -158,27 +169,26 @@
                     }
                 };
 
-                // Event listeners for search input and filter dropdown
-                document.getElementById('search').addEventListener('input', function () {
+                // Event listener for search input
+                document.getElementById('search').addEventListener('input', function() {
                     const query = this.value.trim().toLowerCase();
                     const filterType = document.getElementById('filter').value;
                     displayResults(query, filterType);
                 });
 
-                document.getElementById('filter').addEventListener('change', function () {
+                // Event listener for filter dropdown
+                document.getElementById('filter').addEventListener('change', function() {
                     const filterType = this.value;
                     const query = document.getElementById('search').value.trim().toLowerCase();
                     displayResults(query, filterType);
                 });
 
-                // Initial display of all items
+                // Initial display of all items (filtered for inactive status)
                 displayResults();
-            } catch (error) {
-                console.error('Error fetching Markdown files:', error);
-            }
-        };
-    </script>
+            })
+            .catch(error => console.error('Error fetching Markdown files:', error));
+    };
+</script>
 
 </body>
-
 </html>
