@@ -121,45 +121,44 @@
         };
 
         // Extract structured data from markdown content using regex
-        const extractData = (markdownContent) => {
-    const data = {};
+     const extractData = (markdownContent) => {
+    const dataEntries = [];
+    const entryPattern = /## (.*?)(\n[\s\S]*?)(?=##|$)/g; // Matches each section based on "## Title"
+    
     const patterns = {
         description: /- \*\*Description\*\*: (.*)/,
         exampleValues: /- \*\*Example Values\*\*: (.*)/,
         pageContext: /- \*\*Page Context\*\*: (.*)/,
         notes: /- \*\*Notes\*\*: (.*)/,
         exceptions: /- \*\*Exceptions\*\*: (.*)/,
-        status: /-\s*\*\*Status\*\*:\s*(Archived|Active|Inactive)/i,  // Updated regex
-        tags: /- \*\*Tags\*\*: (.*)/,
-        title: /## (.*)\n/ // Match the variable name (h2 -> ##)
+        status: /-\s*\*\*Status\*\*:\s*(Archived|Active|Inactive)/i, 
+        tags: /- \*\*Tags\*\*: (.*)/
     };
 
-    // Extract the title (variable name)
-    const titleMatch = markdownContent.match(patterns.title);
-    if (titleMatch) {
-        data.title = titleMatch[1].trim(); // Extract the variable name
-        console.log(`Title extracted: ${data.title}`); // Log title extraction
-    } else {
-        console.log("No title found in this Markdown file.");
-    }
+    // Match each "## Title" section and its content
+    for (const entryMatch of markdownContent.matchAll(entryPattern)) {
+        const entryContent = entryMatch[2]; // The content for each section
+        const data = { title: entryMatch[1].trim() }; // Capture the title
+        
+        console.log(`Extracting data for: ${data.title}`); // Log title extraction
 
-    Object.keys(patterns).forEach(key => {
-        if (key !== 'title') { // Skip the title key
-            const match = markdownContent.match(patterns[key]);
-            if (match && match[1] && isValidField(match[1])) {
-                data[key] = match[1].trim();
-                console.log(`${key} extracted: ${data[key]}`); // Log each field extraction
+        // Extract each field using patterns
+        Object.keys(patterns).forEach(key => {
+            const fieldMatch = entryContent.match(patterns[key]);
+            if (fieldMatch && fieldMatch[1] && isValidField(fieldMatch[1])) {
+                data[key] = fieldMatch[1].trim();
+                console.log(`${key} extracted: ${data[key]}`);
             } else {
-                console.log(`${key} not found or invalid in this Markdown file.`);
+                console.log(`${key} not found or invalid for ${data.title}.`);
             }
-        }
-    });
+        });
 
-    // Specific logging for status field
-    console.log(`Final extracted status: ${data.status || "None"}`);
+        dataEntries.push(data); // Add each complete entry to dataEntries
+    }
     
-    return data;
+    return dataEntries; // Returns an array of all entries in the Markdown
 };
+
 
 
         // Process each Markdown file
