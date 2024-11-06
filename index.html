@@ -59,16 +59,21 @@
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         /* Header inside each card */
         .card-header {
+            width: 100%; /* Make header take full width of the card */
             background-color: #0071bc;
             color: white;
             padding: 10px 15px;
-            border-radius: 8px 8px 0 0;
+            border-radius: 8px 8px 0 0; /* Match card rounding */
             font-size: 1.2em;
             font-weight: bold;
+            margin: 0; /* Remove any default margins */
         }
 
         /* Pill Styling for field names */
