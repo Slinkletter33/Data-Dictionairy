@@ -119,7 +119,7 @@ window.onload = function() {
 
             // Extract content and check for "Status: inactive"
             const content = section.nextElementSibling?.innerHTML || '';
-            const isInactive = content.toLowerCase().includes('status: inactive');
+            const isInactive = content.toLowerCase().includes('status: archived'); // Check for "Status: archived"
 
             dataItems.push({ title, content, type: source.type, isInactive });
         });
