@@ -68,6 +68,23 @@
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            color: white;
+            background-color: #f44336; /* Red for inactive */
+        }
+
+        .status-active {
+            background-color: #4CAF50; /* Green for active */
+        }
+
+        .status-archived {
+            background-color: #FF9800; /* Orange for archived */
+        }
     </style>
 </head>
 <body>
@@ -111,29 +128,10 @@
             sections.forEach(section => {
                 const title = section.innerText;
                 const content = section.nextElementSibling?.innerHTML || '';
-
-                // Log the content to check its structure
-                console.log(`Processing section: ${title}`);
-                console.log(`Content: ${content}`);
-
-                // Extract the status from the content (looking for the <li> with Status)
-                const statusMatch = content.match(/<li><strong>Status<\/strong>:?\s*([\w\s]+)/);
-                const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'unknown'; // Default to 'unknown' if not found
-
-                // Log the status extraction to see if it works
-                console.log(`Extracted status for ${title}: ${status}`);
-
-                // Check if the status is "inactive" or "archived"
-                if (status === 'inactive' || status === 'archived') {
-                    console.log(`Found ${status} result: ${title}`);
-                }
-
-                dataItems.push({
-                    title,
-                    content,
-                    type: source.type,
-                    status
-                });
+                // Check if the status exists in the content
+                const statusMatch = content.match(/<li><strong>Status<\/strong>: (.*?)<\/li>/);
+                const status = statusMatch ? statusMatch[1].trim() : 'active'; // Default to active if no status
+                dataItems.push({ title, content, type: source.type, status });
             });
         };
 
@@ -163,12 +161,17 @@
 
                     // Display results
                     if (filteredItems.length > 0) {
-                        resultsContainer.innerHTML = filteredItems.map(doc => `
-                            <div class="result-card">
-                                <h3>${doc.title}</h3>
-                                <p>${marked(doc.content)}</p>
-                            </div>
-                        `).join('');
+                        resultsContainer.innerHTML = filteredItems.map(doc => {
+                            // Only show the status if it's not 'inactive'
+                            const statusBadge = doc.status !== 'inactive' ? `<span class="status-badge status-${doc.status.toLowerCase()}">${doc.status}</span>` : '';
+                            return `
+                                <div class="result-card">
+                                    <h3>${doc.title}</h3>
+                                    ${statusBadge}
+                                    <p>${marked(doc.content)}</p>
+                                </div>
+                            `;
+                        }).join('');
                     } else {
                         resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                     }
