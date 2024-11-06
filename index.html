@@ -149,7 +149,7 @@
                 // Function to display filtered results based on search query and filter type
                 const displayResults = (query = '', filterType = 'all') => {
                     const resultsContainer = document.getElementById('results');
-                    
+
                     // Filter dataItems based on query and type
                     const filteredItems = dataItems.filter(doc => {
                         const matchesType = filterType === 'all' || doc.type === filterType;
@@ -164,11 +164,43 @@
                         resultsContainer.innerHTML = filteredItems.map(doc => {
                             // Only show the status if it's not 'inactive'
                             const statusBadge = doc.status !== 'inactive' ? `<span class="status-badge status-${doc.status.toLowerCase()}">${doc.status}</span>` : '';
+
+                            let resultContent = '';
+                            // Only show the field if it's not empty, N/A, or None
+                            if (doc.content && doc.content.trim() !== 'N/A' && doc.content.trim() !== 'None') {
+                                resultContent += `<li><strong>Description</strong>: ${doc.content}</li>`;
+                            }
+                            // Handle other fields similarly
+                            const exampleValues = 'mobile'; // You can replace this logic as needed
+                            if (exampleValues && exampleValues.trim() !== 'N/A' && exampleValues.trim() !== 'None') {
+                                resultContent += `<li><strong>Example Values</strong>: ${exampleValues}</li>`;
+                            }
+
+                            const pageContext = '[Specify page context]';
+                            if (pageContext && pageContext.trim() !== 'N/A' && pageContext.trim() !== 'None') {
+                                resultContent += `<li><strong>Page Context</strong>: ${pageContext}</li>`;
+                            }
+
+                            const notes = 'Event type description';
+                            if (notes && notes.trim() !== 'N/A' && notes.trim() !== 'None') {
+                                resultContent += `<li><strong>Notes</strong>: ${notes}</li>`;
+                            }
+
+                            const exceptions = 'N/A'; // Replace as needed
+                            if (exceptions && exceptions.trim() !== 'N/A' && exceptions.trim() !== 'None') {
+                                resultContent += `<li><strong>Exceptions</strong>: ${exceptions}</li>`;
+                            }
+
+                            const tags = 'marketing'; // Replace as needed
+                            if (tags && tags.trim() !== 'N/A' && tags.trim() !== 'None') {
+                                resultContent += `<li><strong>Tags</strong>: ${tags}</li>`;
+                            }
+
                             return `
                                 <div class="result-card">
                                     <h3>${doc.title}</h3>
                                     ${statusBadge}
-                                    <p>${marked(doc.content)}</p>
+                                    <ul>${resultContent}</ul>
                                 </div>
                             `;
                         }).join('');
