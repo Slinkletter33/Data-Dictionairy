@@ -211,7 +211,7 @@
                                         ${isValidField(pageContext) ? `<li><strong>Page Context</strong>: ${pageContext}</li>` : ''}
                                         ${isValidField(notes) ? `<li><strong>Notes</strong>: ${notes}</li>` : ''}
                                         ${isValidField(exceptions) ? `<li><strong>Exceptions</strong>: ${exceptions}</li>` : ''}
-                                        ${`<li><strong>Status</strong>: ${status}</li>` : ''}
+                                        ${isValidField(status) ? `<li><strong>Status</strong>: ${status}</li>` : ''}
                                         ${isValidField(tags) ? `<li><strong>Tags</strong>: ${tags}</li>` : ''}
                                     </ul>
                                 </div>`;
