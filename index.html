@@ -104,130 +104,74 @@
 <div id="results"></div>
 
 <script>
-    window.onload = function() {
-        const sources = [
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
-        ];
-        
-        const dataItems = []; // Combined array for all items
+  // Function to check if the content should be displayed (not empty, "N/A", or "None")
+const isValidField = (value) => {
+    return value && value.trim() !== 'N/A' && value.trim() !== 'None' && value.trim() !== '';
+};
 
-        // Function to fetch, parse, and process each Markdown file
-        const fetchAndProcess = async (source) => {
-            const response = await fetch(source.url);
-            if (!response.ok) throw new Error(`Error fetching ${source.url}`);
-            
-            const data = await response.text();
-            const html = marked(data);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Extract relevant sections (assuming `h2` as headers)
-            const sections = doc.querySelectorAll('h2');
-            sections.forEach(section => {
-                const title = section.innerText;
-                const content = section.nextElementSibling?.innerHTML || '';
-                // Check if the status exists in the content
-                const statusMatch = content.match(/<li><strong>Status<\/strong>: (.*?)<\/li>/);
-                const status = statusMatch ? statusMatch[1].trim() : 'active'; // Default to active if no status
-                dataItems.push({ title, content, type: source.type, status });
-            });
-        };
+const displayResults = (query = '', filterType = 'all') => {
+    const resultsContainer = document.getElementById('results');
 
-        // Fetch all sources and then initialize the search index
-        Promise.all(sources.map(fetchAndProcess))
-            .then(() => {
-                const index = lunr(function () {
-                    this.field('title');
-                    this.field('content');
-                    dataItems.forEach((doc, id) => {
-                        this.add({ id: id, ...doc });
-                    }, this);
-                });
+    // Filter dataItems based on query and type
+    const filteredItems = dataItems.filter(doc => {
+        const matchesType = filterType === 'all' || doc.type === filterType;
+        const matchesQuery = query ? 
+            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) : 
+            true;
+        return matchesType && matchesQuery;
+    });
 
-                // Function to display filtered results based on search query and filter type
-                const displayResults = (query = '', filterType = 'all') => {
-                    const resultsContainer = document.getElementById('results');
+    // Display results
+    if (filteredItems.length > 0) {
+        resultsContainer.innerHTML = filteredItems.map(doc => {
+            // Only show the status if it's not 'inactive'
+            const statusBadge = doc.status !== 'inactive' ? `<span class="status-badge status-${doc.status.toLowerCase()}">${doc.status}</span>` : '';
 
-                    // Filter dataItems based on query and type
-                    const filteredItems = dataItems.filter(doc => {
-                        const matchesType = filterType === 'all' || doc.type === filterType;
-                        const matchesQuery = query ? 
-                            (doc.title.toLowerCase().includes(query) || doc.content.toLowerCase().includes(query)) : 
-                            true;
-                        return matchesType && matchesQuery;
-                    });
+            // Build the result content dynamically based on valid fields
+            let resultContent = '';
 
-                    // Display results
-                    if (filteredItems.length > 0) {
-                        resultsContainer.innerHTML = filteredItems.map(doc => {
-                            // Only show the status if it's not 'inactive'
-                            const statusBadge = doc.status !== 'inactive' ? `<span class="status-badge status-${doc.status.toLowerCase()}">${doc.status}</span>` : '';
+            // Check if fields are valid (not N/A, None, or empty) before displaying
+            if (isValidField(doc.content)) {
+                resultContent += `<li><strong>Description</strong>: ${doc.content}</li>`;
+            }
+            const exampleValues = 'mobile'; // Replace this with dynamic value
+            if (isValidField(exampleValues)) {
+                resultContent += `<li><strong>Example Values</strong>: ${exampleValues}</li>`;
+            }
 
-                            let resultContent = '';
-                            // Only show the field if it's not empty, N/A, or None
-                            if (doc.content && doc.content.trim() !== 'N/A' && doc.content.trim() !== 'None') {
-                                resultContent += `<li><strong>Description</strong>: ${doc.content}</li>`;
-                            }
-                            // Handle other fields similarly
-                            const exampleValues = 'mobile'; // You can replace this logic as needed
-                            if (exampleValues && exampleValues.trim() !== 'N/A' && exampleValues.trim() !== 'None') {
-                                resultContent += `<li><strong>Example Values</strong>: ${exampleValues}</li>`;
-                            }
+            const pageContext = '[Specify page context]'; // Replace with dynamic value
+            if (isValidField(pageContext)) {
+                resultContent += `<li><strong>Page Context</strong>: ${pageContext}</li>`;
+            }
 
-                            const pageContext = '[Specify page context]';
-                            if (pageContext && pageContext.trim() !== 'N/A' && pageContext.trim() !== 'None') {
-                                resultContent += `<li><strong>Page Context</strong>: ${pageContext}</li>`;
-                            }
+            const notes = 'Event type description'; // Replace with dynamic value
+            if (isValidField(notes)) {
+                resultContent += `<li><strong>Notes</strong>: ${notes}</li>`;
+            }
 
-                            const notes = 'Event type description';
-                            if (notes && notes.trim() !== 'N/A' && notes.trim() !== 'None') {
-                                resultContent += `<li><strong>Notes</strong>: ${notes}</li>`;
-                            }
+            const exceptions = 'N/A'; // Replace with dynamic value
+            if (isValidField(exceptions)) {
+                resultContent += `<li><strong>Exceptions</strong>: ${exceptions}</li>`;
+            }
 
-                            const exceptions = 'N/A'; // Replace as needed
-                            if (exceptions && exceptions.trim() !== 'N/A' && exceptions.trim() !== 'None') {
-                                resultContent += `<li><strong>Exceptions</strong>: ${exceptions}</li>`;
-                            }
+            const tags = 'marketing'; // Replace with dynamic value
+            if (isValidField(tags)) {
+                resultContent += `<li><strong>Tags</strong>: ${tags}</li>`;
+            }
 
-                            const tags = 'marketing'; // Replace as needed
-                            if (tags && tags.trim() !== 'N/A' && tags.trim() !== 'None') {
-                                resultContent += `<li><strong>Tags</strong>: ${tags}</li>`;
-                            }
+            return `
+                <div class="result-card">
+                    <h3>${doc.title}</h3>
+                    ${statusBadge}
+                    <ul>${resultContent}</ul>
+                </div>
+            `;
+        }).join('');
+    } else {
+        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
+    }
+};
 
-                            return `
-                                <div class="result-card">
-                                    <h3>${doc.title}</h3>
-                                    ${statusBadge}
-                                    <ul>${resultContent}</ul>
-                                </div>
-                            `;
-                        }).join('');
-                    } else {
-                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
-                    }
-                };
-
-                // Event listener for search input
-                document.getElementById('search').addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase();
-                    const filterType = document.getElementById('filter').value;
-                    displayResults(query, filterType);
-                });
-
-                // Event listener for filter dropdown
-                document.getElementById('filter').addEventListener('change', function() {
-                    const filterType = this.value;
-                    const query = document.getElementById('search').value.trim().toLowerCase();
-                    displayResults(query, filterType);
-                });
-
-                // Initial display of all items
-                displayResults();
-            })
-            .catch(error => console.error('Error fetching Markdown files:', error));
-    };
 </script>
 
 </body>
