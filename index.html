@@ -25,6 +25,11 @@ h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
     text-align: center;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    z-index: 10; /* Ensures the header stays above other content */
+    padding: 10px 0;
 }
 
 /* Container for filter and search */
@@ -43,11 +48,18 @@ input[type="text"], select {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 20px; /* Rounded corners */
     background-color: white;
     color: #333333;
     margin-bottom: 10px;
     box-sizing: border-box;
+    transition: box-shadow 0.3s ease; /* Smooth transition */
+}
+
+input[type="text"]:focus, select:focus {
+    box-shadow: 0 0 8px rgba(0, 123, 188, 0.6); /* Blue glow on focus */
+    border-color: #0071bc;
+    outline: none;
 }
 
 /* Ensure the results container takes full width */
@@ -63,10 +75,19 @@ input[type="text"], select {
     margin: 0 auto 20px; /* Centers the card horizontally */
     border: 1px solid #e1e4e8;
     border-radius: 8px;
-    background-color: #ffffff;
+    background: linear-gradient(135deg, #f5f7f9 0%, #e9eff1 100%);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     box-sizing: border-box; /* Ensures padding and border don't affect width */
     overflow: hidden; /* Prevents overflow from shrinking the card */
+    animation: fadeIn 0.5s ease-out; /* Fade-in effect */
+    transition: background 0.3s ease; /* Smooth transition on hover */
+}
+
+.result-card:hover {
+    background: linear-gradient(135deg, #f0f8ff 0%, #d1e7f2 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow on hover */
+    cursor: pointer;
+    transform: translateY(-3px); /* Slightly lift the card */
 }
 
 /* Card Header */
@@ -75,7 +96,7 @@ input[type="text"], select {
     padding: 15px 15px;
     background-color: #00203E;
     color: white;
-    font-size: 1.2em;
+    font-size: 1.4em; /* Slightly larger title */
     font-weight: bold;
     border-radius: 8px 8px 0 0;
     box-sizing: border-box;
@@ -98,12 +119,12 @@ input[type="text"], select {
 /* Pill Styling for field names */
 .pill {
     display: inline-block;
-    background-color: #068682;
+    background-color: #0071bc; /* Primary color */
     color: white;
     padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-    margin-right: 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    margin-right: 8px;
 }
 
 /* Styling for the result text next to the pill */
@@ -134,6 +155,26 @@ input[type="text"], select {
     .search-container {
         width: 80%; /* Wider search container on very small screens */
     }
+}
+
+/* Card Footer (if needed in the future) */
+/* .card-footer {
+    padding: 10px 15px;
+    background-color: #f1f1f1;
+    text-align: center;
+    border-radius: 0 0 8px 8px;
+    border-top: 1px solid #e1e4e8;
+} */
+
+/* Smooth Scroll for Result Cards */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Fade-in Animation for Cards */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
     </style>
