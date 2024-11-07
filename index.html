@@ -38,6 +38,16 @@ h1 {
     box-sizing: border-box;
 }
 
+        .results {
+    width: 80%; /* Same width for both search and result cards */
+    min-width: 200px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
 /* Search Bar and Dropdown Styling */
 input[type="text"], select {
     width: 100%;
@@ -154,7 +164,7 @@ input[type="text"], select {
     <input type="text" id="search" placeholder="Search the Data...">
 </div>
 
-<div id="results"></div>
+<div class="results"></div>
 
 <script>
     window.onload = async function() {
