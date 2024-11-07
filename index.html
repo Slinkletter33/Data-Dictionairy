@@ -29,7 +29,7 @@ h1 {
 
 /* Container for filter and search */
 .search-container {
-    width: 80%; /* Ensure it has the same width as the result cards */
+    width: 80%; /* Same width for both search and result cards */
     min-width: 200px;
     margin-bottom: 20px;
     display: flex;
@@ -53,17 +53,17 @@ input[type="text"], select {
 
 /* Result Cards */
 .result-card {
-    width: 80%; /* Same as search container */
-    max-width: 600px; /* Optional: Max width for better readability */
+    width: 100%; /* Ensure it matches the search container width */
+    max-width: 80%; /* Matches the width of the search container */
+    min-width: 200px; /* Ensures it doesn’t shrink too much */
     margin: 0 auto 20px;
     padding: 0;
     border: 1px solid #e1e4e8;
     border-radius: 8px;
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    box-sizing: border-box; /* Ensure padding doesn't affect width */
-    min-width: 400px; /* Ensure cards don’t shrink below a certain size */
-    display: block; /* Ensure the card respects width */
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    display: block; /* Make sure it's block-level */
 }
 
 /* Card Header */
@@ -122,16 +122,19 @@ input[type="text"], select {
 /* Responsive Search Container */
 @media (max-width: 1024px) {
     .search-container {
-        width: 50%; /* Adjust width for smaller screens */
+        width: 80%; /* Adjust width for smaller screens */
+    }
+    .result-card {
+        width: 100%; /* Ensure card is also 100% width for smaller screens */
     }
 }
 
 @media (max-width: 768px) {
-    .result-card {
-        width: 100%; /* Full width on smaller screens */
-    }
     .search-container {
         width: 80%; /* Wider search container on very small screens */
+    }
+    .result-card {
+        width: 100%; /* Full width on smaller screens */
     }
 }
 
