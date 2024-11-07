@@ -168,7 +168,7 @@
 </head>
 <body>
 
-<h1>Adobe Data Repository</h1>
+<h1>Adobe Data Dictionary</h1>
 
 <div class="search-container">
     <select id="filter">
@@ -238,17 +238,17 @@ window.onload = async function() {
             const title = match[1].trim();
             const content = match[2].trim();
 
-            const doc = { title, type: '', description: '', exampleValues: '', pageContext: '', notes: '', exceptions: '', status: '', tags: [] };
+            const doc = {
+                title: title,
+                description: content.match(patterns.description)?.[1] || '',
+                exampleValues: content.match(patterns.exampleValues)?.[1] || 'N/A',
+                pageContext: content.match(patterns.pageContext)?.[1] || 'N/A',
+                notes: content.match(patterns.notes)?.[1] || 'N/A',
+                exceptions: content.match(patterns.exceptions)?.[1] || 'N/A',
+                status: content.match(patterns.status)?.[1] || 'N/A',
+                tags: content.match(patterns.tags)?.[1]?.split(',').map(tag => tag.trim()) || []
+            };
 
-            for (let field in patterns) {
-                const fieldMatch = content.match(patterns[field]);
-                if (fieldMatch && fieldMatch[1]) {
-                    doc[field] = fieldMatch[1].trim();
-                }
-            }
-
-            // Ensure tags is always an array
-            doc.tags = Array.isArray(doc.tags) ? doc.tags : (doc.tags ? [doc.tags] : []);
             dataEntries.push(doc);
         }
         return dataEntries;
@@ -275,12 +275,12 @@ window.onload = async function() {
                         <span class="result">${doc.description}</span>
                     </div>
                     <div class="expandable-content" id="expand-${cardId}">
-                        <p><strong>Example Values:</strong> ${doc.exampleValues || 'N/A'}</p>
-                        <p><strong>Page Context:</strong> ${doc.pageContext || 'N/A'}</p>
-                        <p><strong>Notes:</strong> ${doc.notes || 'N/A'}</p>
-                        <p><strong>Exceptions:</strong> ${doc.exceptions || 'N/A'}</p>
-                        <p><strong>Status:</strong> ${doc.status || 'N/A'}</p>
-                        <p><strong>Tags:</strong> ${doc.tags.join(', ') || 'N/A'}</p>
+                        <p><strong>Example Values:</strong> ${doc.exampleValues}</p>
+                        <p><strong>Page Context:</strong> ${doc.pageContext}</p>
+                        <p><strong>Notes:</strong> ${doc.notes}</p>
+                        <p><strong>Exceptions:</strong> ${doc.exceptions}</p>
+                        <p><strong>Status:</strong> ${doc.status}</p>
+                        <p><strong>Tags:</strong> ${doc.tags.join(', ')}</p>
                     </div>
                     <button class="expand-btn" onclick="toggleExpand('${cardId}')">Expand</button>
                 </div>
