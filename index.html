@@ -37,6 +37,8 @@ h1 {
     width: 80%;
     min-width: 200px;
     margin-bottom: 20px;
+    position: sticky;
+    z-index: 10; /* Ensures the header stays above other content */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -79,7 +81,6 @@ input[type="text"]:focus, select:focus {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     box-sizing: border-box; /* Ensures padding and border don't affect width */
     overflow: hidden; /* Prevents overflow from shrinking the card */
-    animation: fadeIn 0.5s ease-out; /* Fade-in effect */
     transition: background 0.3s ease; /* Smooth transition on hover */
 }
 
