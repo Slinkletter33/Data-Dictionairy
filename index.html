@@ -115,6 +115,7 @@
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            flex-wrap: wrap; /* Allows the pills to wrap if there's no space */
         }
 
         /* Pill Styling for field names */
@@ -126,6 +127,7 @@
             border-radius: 15px;
             font-size: 14px;
             margin-right: 8px;
+            margin-bottom: 8px; /* Adds space between pills */
         }
 
         /* Styling for the result text next to the pill */
@@ -286,7 +288,7 @@ window.onload = async function() {
         `;
         resultsContainer.innerHTML += cardContent;
     });
-}
+};
 </script>
 
 </body>
