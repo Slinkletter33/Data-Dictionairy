@@ -142,56 +142,26 @@
             font-size: 1.2em;
         }
 
-        /* Expandable content */
-        .expandable-content {
-            display: none; /* Hidden by default */
-            transition: max-height 0.3s ease-in-out;
-            max-height: 0;
-            overflow: hidden; /* Hide content outside max height */
-        }
-
-        .expandable-content.expanded {
-            display: block; /* Show content when expanded */
-            max-height: 500px; /* Max height for expanded content */
-        }
-
-        /* Expand button */
-        .expand-btn {
-            margin-top: 10px;
-            background-color: #0071bc;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .expand-btn:hover {
-            background-color: #005fa3;
-        }
-
-        /* Responsive Search Container */
-        @media (max-width: 1024px) {
-            .search-container {
-                width: 50%; /* Adjusts width for smaller screens */
-            }
-        }
-
-        @media (max-width: 768px) {
-            .result-card {
-                width: 90%; /* Adjusts card width to 90% on smaller screens */
-            }
-            .search-container {
-                width: 80%; /* Wider search container on very small screens */
-            }
-        }
-
         /* Smooth Scroll for Result Cards */
         html {
             scroll-behavior: smooth;
         }
+
+        /* Fade-in Animation for Cards */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Expanded content hidden initially */
+        .expandable-content {
+            display: none;
+        }
+
+        .expandable-content.expanded {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -211,159 +181,110 @@
 <div id="results"></div>
 
 <script>
-    window.onload = async function() {
-        const sources = [
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
-            { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
-        ];
+// Function to toggle the expanded view of the content
+function toggleExpand(cardId) {
+    const content = document.getElementById(`expand-${cardId}`);
+    const button = content.nextElementSibling;
 
-        const dataItems = [];
+    if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        button.textContent = 'Expand'; // Change button text to "Expand"
+    } else {
+        content.classList.add('expanded');
+        button.textContent = 'Collapse'; // Change button text to "Collapse"
+    }
+}
 
-        // Fetch Markdown content
-        async function fetchMarkdown(url) {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error fetching ${url}`);
-            return await response.text();
-        }
+window.onload = async function() {
+    const sources = [
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/eVars.md', type: 'eVar' },
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/props.md', type: 'Prop' },
+        { url: 'https://raw.githubusercontent.com/Slinkletter33/Data-Dictionairy/main/events.md', type: 'Event' }
+    ];
 
-        // Validate fields (skip if "N/A", "None", or empty)
-        const isValidField = (value) => {
-            return value && value.trim() !== 'N/A' && value.trim() !== 'None' && value.trim() !== '';
-        };
+    const dataItems = [];
 
-        // Extract structured data from markdown content using regex
-        const extractData = (markdownContent) => {
-            const dataEntries = [];
-            const entryPattern = /## (.*?)(\n[\s\S]*?)(?=##|$)/g;
+    // Fetch Markdown content
+    async function fetchMarkdown(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error fetching ${url}`);
+        return await response.text();
+    }
 
-            const patterns = {
-                description: /- \*\*Description\*\*: (.*)/,
-                exampleValues: /- \*\*Example Values\*\*: (.*)/,
-                pageContext: /- \*\*Page Context\*\*: (.*)/,
-                notes: /- \*\*Notes\*\*: (.*)/,
-                exceptions: /- \*\*Exceptions\*\*: (.*)/,
-                status: /- \*\*Status\*\*: (.*)/,
-                tags: /- \*\*Tags\*\*: (.*)/,
-            };
-
-            let match;
-            while (match = entryPattern.exec(markdownContent)) {
-                const entryTitle = match[1].trim();
-                const entryContent = match[2];
-                const data = { title: entryTitle, type: entryTitle.includes('eVar') ? 'eVar' : 'Prop' };
-
-                // Extract fields based on regex patterns
-                for (const [field, pattern] of Object.entries(patterns)) {
-                    const fieldMatch = entryContent.match(pattern);
-                    if (fieldMatch) {
-                        data[field] = fieldMatch[1].trim();
-                    }
-                }
-
-                dataItems.push(data);
-            }
-        };
-
-        // Loop through sources and fetch data
-        for (const source of sources) {
-            const markdownContent = await fetchMarkdown(source.url);
-            extractData(markdownContent);
-        }
-
-        // Function to display results based on query
-        const displayResults = (query = '', filterType = 'all') => {
-            const resultsContainer = document.getElementById('results');
-
-            const filteredItems = dataItems.filter(doc => {
-                const matchesType = filterType === 'all' || doc.type === filterType;
-                const matchesQuery = query ? 
-                    (doc.title && doc.title.toLowerCase().includes(query)) : true; // Check only the title
-                return matchesType && matchesQuery;
-            });
-
-            if (filteredItems.length > 0) {
-                resultsContainer.innerHTML = filteredItems.map(doc => {
-                    const { title, description, exampleValues, pageContext, notes, exceptions, status, tags } = doc;
-
-                    let cardContent = `
-                        <div class="result-card">
-                            <div class="card-header">${title}</div>
-                            <div class="card-content">
-                                <div class="card-field">
-                                    <div class="pill">Description:</div>
-                                    <div class="result">${description}</div>
-                                </div>
-                                
-                                <div class="expandable-content" id="expand-${doc.title.replace(/\s+/g, '-')}">
-                                    ${isValidField(exampleValues) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Example Values:</div>
-                                            <div class="result">${exampleValues}</div>
-                                        </div>` : ''}
-                                    ${isValidField(pageContext) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Page Context:</div>
-                                            <div class="result">${pageContext}</div>
-                                        </div>` : ''}
-                                    ${isValidField(notes) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Notes:</div>
-                                            <div class="result">${notes}</div>
-                                        </div>` : ''}
-                                    ${isValidField(exceptions) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Exceptions:</div>
-                                            <div class="result">${exceptions}</div>
-                                        </div>` : ''}
-                                    ${isValidField(status) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Status:</div>
-                                            <div class="result">${status}</div>
-                                        </div>` : ''}
-                                    ${isValidField(tags) ? `
-                                        <div class="card-field">
-                                            <div class="pill">Tags:</div>
-                                            <div class="result">${tags}</div>
-                                        </div>` : ''}
-                                </div>
-                                <button class="expand-btn" onclick="toggleExpand('${doc.title.replace(/\s+/g, '-')}', '${doc.title}')">Expand</button>
-                            </div>
-                        </div>`;
-
-                    return cardContent;
-                }).join('');
-            } else {
-                resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
-            }
-        };
-
-        // Toggle expand/collapse of the card content
-        function toggleExpand(cardId, title) {
-            const content = document.getElementById(`expand-${cardId}`);
-            const button = content.nextElementSibling; // The expand button
-
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                button.textContent = 'Expand'; // Change button text to "Expand"
-            } else {
-                content.classList.add('expanded');
-                button.textContent = 'Collapse'; // Change button text to "Collapse"
-            }
-        }
-
-        // Event listeners for search input and filter
-        document.getElementById('search').addEventListener('input', (e) => {
-            displayResults(e.target.value, document.getElementById('filter').value);
-        });
-
-        document.getElementById('filter').addEventListener('change', (e) => {
-            displayResults(document.getElementById('search').value, e.target.value);
-        });
-
-        // Initial display with all items
-        displayResults();
+    // Validate fields (skip if "N/A", "None", or empty)
+    const isValidField = (value) => {
+        return value && value.trim() !== 'N/A' && value.trim() !== 'None' && value.trim() !== '';
     };
+
+    // Extract structured data from markdown content using regex
+    const extractData = (markdownContent) => {
+        const dataEntries = [];
+        const entryPattern = /## (.*?)(\n[\s\S]*?)(?=##|$)/g;
+        
+        const patterns = {
+            description: /- \*\*Description\*\*: (.*)/,
+            exampleValues: /- \*\*Example Values\*\*: (.*)/,
+            pageContext: /- \*\*Page Context\*\*: (.*)/,
+            notes: /- \*\*Notes\*\*: (.*)/,
+            exceptions: /- \*\*Exceptions\*\*: (.*)/,
+            status: /-\s*\*\*Status\*\*:\s*(Archived|Active|Inactive)/i, 
+            tags: /- \*\*Tags\*\*: (.*)/
+        };
+
+        let match;
+        while ((match = entryPattern.exec(markdownContent)) !== null) {
+            const title = match[1].trim();
+            const content = match[2].trim();
+
+            const doc = { title, type: '', description: '', exampleValues: '', pageContext: '', notes: '', exceptions: '', status: '', tags: [] };
+
+            for (let field in patterns) {
+                const fieldMatch = content.match(patterns[field]);
+                if (fieldMatch && fieldMatch[1]) {
+                    doc[field] = fieldMatch[1].trim();
+                }
+            }
+
+            dataEntries.push(doc);
+        }
+        return dataEntries;
+    };
+
+    // Fetch and process data
+    for (let source of sources) {
+        const markdownContent = await fetchMarkdown(source.url);
+        const entries = extractData(markdownContent);
+        entries.forEach(entry => entry.type = source.type);
+        dataItems.push(...entries);
+    }
+
+    // Render results
+    const resultsContainer = document.getElementById('results');
+    dataItems.forEach((doc, index) => {
+        const cardId = doc.title.replace(/\s+/g, '-');
+        const cardContent = `
+            <div class="result-card">
+                <div class="card-header">${doc.title}</div>
+                <div class="card-content">
+                    <div class="card-field">
+                        <span class="pill">${doc.type}</span>
+                        <span class="result">${doc.description}</span>
+                    </div>
+                    <div class="expandable-content" id="expand-${cardId}">
+                        <p><strong>Example Values:</strong> ${doc.exampleValues || 'N/A'}</p>
+                        <p><strong>Page Context:</strong> ${doc.pageContext || 'N/A'}</p>
+                        <p><strong>Notes:</strong> ${doc.notes || 'N/A'}</p>
+                        <p><strong>Exceptions:</strong> ${doc.exceptions || 'N/A'}</p>
+                        <p><strong>Status:</strong> ${doc.status || 'N/A'}</p>
+                        <p><strong>Tags:</strong> ${doc.tags.join(', ') || 'N/A'}</p>
+                    </div>
+                    <button class="expand-btn" onclick="toggleExpand('${cardId}')">Expand</button>
+                </div>
+            </div>
+        `;
+        resultsContainer.innerHTML += cardContent;
+    });
+}
 </script>
 
 </body>
