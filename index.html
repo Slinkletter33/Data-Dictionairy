@@ -25,11 +25,6 @@
             font-size: 2.5em;
             margin-bottom: 10px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            background-color: #ffffff;
-            z-index: 10; /* Ensures the header stays above other content */
-            padding: 10px 0;
         }
 
         /* Container for filter and search */
@@ -37,8 +32,6 @@
             width: 80%;
             min-width: 200px;
             margin-bottom: 20px;
-            position: sticky;
-            z-index: 10; /* Ensures the header stays above other content */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -50,64 +43,34 @@
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
-            border-radius: 20px; /* Rounded corners */
-            background-color: white;
-            color: #333333;
+            border-radius: 20px;
             margin-bottom: 10px;
-            box-sizing: border-box;
-            transition: box-shadow 0.3s ease; /* Smooth transition */
-        }
-
-        input[type="text"]:focus, select:focus {
-            box-shadow: 0 0 8px rgba(0, 123, 188, 0.6); /* Blue glow on focus */
-            border-color: #0071bc;
-            outline: none;
-        }
-
-        /* Ensure the results container takes full width */
-        #results {
-            width: 100%; /* Ensures it uses full width available */
-            padding: 0 10px; /* Optional: Adds padding around the cards */
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
         }
 
         /* Result Cards */
         .result-card {
-            width: 80%; /* Always 80% of the parent container */
-            margin: 0 auto 20px; /* Centers the card horizontally */
+            width: 80%;
+            margin: 0 auto 20px;
             border: 1px solid #e1e4e8;
             border-radius: 8px;
-            background: linear-gradient(135deg, #f5f7f9 0%, #e9eff1 100%);
+            background: #f5f7f9;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box; /* Ensures padding and border don't affect width */
-            overflow: hidden; /* Prevents overflow from shrinking the card */
-            transition: background 0.3s ease; /* Smooth transition on hover */
-        }
-
-        .result-card:hover {
-            background: linear-gradient(135deg, #f0f8ff 0%, #d1e7f2 100%);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow on hover */
-            cursor: pointer;
-            transform: translateY(-3px); /* Slightly lift the card */
+            overflow: hidden;
+            transition: background 0.3s ease;
         }
 
         /* Card Header */
         .card-header {
-            width: 100%;
-            padding: 15px 15px;
+            padding: 15px;
             background-color: #00203E;
             color: white;
-            font-size: 1.4em; /* Slightly larger title */
+            font-size: 1.4em;
             font-weight: bold;
-            border-radius: 8px 8px 0 0;
-            box-sizing: border-box;
-            padding-left: 30px;
         }
 
         /* Card Content */
         .card-content {
             padding: 10px 15px;
-            padding-left: 20px; /* Increased left padding */
         }
 
         /* Result Fields */
@@ -115,47 +78,20 @@
             margin-bottom: 15px;
             display: flex;
             align-items: center;
-            flex-wrap: wrap; /* Allows the pills to wrap if there's no space */
         }
 
-        /* Pill Styling for field names */
+        /* Pill Styling */
         .pill {
             display: inline-block;
-            background-color: #0071bc; /* Primary color */
+            background-color: #0071bc;
             color: white;
             padding: 5px 12px;
             border-radius: 15px;
             font-size: 14px;
             margin-right: 8px;
-            margin-bottom: 8px; /* Adds space between pills */
         }
 
-        /* Styling for the result text next to the pill */
-        .result {
-            display: inline-block;
-            font-size: 16px;
-            margin-top: 5px;
-            flex: 1;
-        }
-
-        /* No results message styling */
-        .no-results {
-            color: #ff0000;
-            font-size: 1.2em;
-        }
-
-        /* Smooth Scroll for Result Cards */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Fade-in Animation for Cards */
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* Expanded content hidden initially */
+        /* Expandable content styling */
         .expandable-content {
             display: none;
         }
@@ -164,6 +100,19 @@
             display: block;
         }
 
+        /* Button to expand/collapse */
+        .expand-btn {
+            padding: 8px 16px;
+            background-color: #0071bc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .expand-btn:hover {
+            background-color: #005b8a;
+        }
     </style>
 </head>
 <body>
@@ -195,6 +144,20 @@ function toggleExpand(cardId) {
         content.classList.add('expanded');
         button.textContent = 'Collapse'; // Change button text to "Collapse"
     }
+}
+
+// Search functionality
+function searchAndFilter() {
+    const searchQuery = document.getElementById('search').value.toLowerCase();
+    const filter = document.getElementById('filter').value;
+    
+    const filteredData = dataItems.filter(doc => {
+        const matchesSearch = doc.title.toLowerCase().includes(searchQuery) || 
+                              doc.description.toLowerCase().includes(searchQuery);
+        const matchesType = filter === "all" || doc.type === filter;
+        return matchesSearch && matchesType;
+    });
+    renderResults(filteredData);
 }
 
 window.onload = async function() {
@@ -263,31 +226,46 @@ window.onload = async function() {
     }
 
     // Render results
-    const resultsContainer = document.getElementById('results');
-    dataItems.forEach((doc, index) => {
-        const cardId = doc.title.replace(/\s+/g, '-');
-        const cardContent = `
-            <div class="result-card">
-                <div class="card-header">${doc.title}</div>
-                <div class="card-content">
-                    <div class="card-field">
-                        <span class="pill">${doc.type}</span>
-                        <span class="result">${doc.description}</span>
+    function renderResults(data) {
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = ''; // Clear existing results
+
+        if (data.length === 0) {
+            resultsContainer.innerHTML = '<p class="no-results">No results found</p>';
+            return;
+        }
+
+        data.forEach((doc, index) => {
+            const cardId = doc.title.replace(/\s+/g, '-');
+            const cardContent = `
+                <div class="result-card">
+                    <div class="card-header">${doc.title}</div>
+                    <div class="card-content">
+                        <div class="card-field">
+                            <span class="pill">${doc.type}</span>
+                            <span class="result">${doc.description}</span>
+                        </div>
+                        <div class="expandable-content" id="expand-${cardId}">
+                            <p><strong>Example Values:</strong> ${doc.exampleValues}</p>
+                            <p><strong>Page Context:</strong> ${doc.pageContext}</p>
+                            <p><strong>Notes:</strong> ${doc.notes}</p>
+                            <p><strong>Exceptions:</strong> ${doc.exceptions}</p>
+                            <p><strong>Status:</strong> ${doc.status}</p>
+                            <p><strong>Tags:</strong> ${doc.tags.join(', ')}</p>
+                        </div>
+                        <button class="expand-btn" onclick="toggleExpand('${cardId}')">Expand</button>
                     </div>
-                    <div class="expandable-content" id="expand-${cardId}">
-                        <p><strong>Example Values:</strong> ${doc.exampleValues}</p>
-                        <p><strong>Page Context:</strong> ${doc.pageContext}</p>
-                        <p><strong>Notes:</strong> ${doc.notes}</p>
-                        <p><strong>Exceptions:</strong> ${doc.exceptions}</p>
-                        <p><strong>Status:</strong> ${doc.status}</p>
-                        <p><strong>Tags:</strong> ${doc.tags.join(', ')}</p>
-                    </div>
-                    <button class="expand-btn" onclick="toggleExpand('${cardId}')">Expand</button>
                 </div>
-            </div>
-        `;
-        resultsContainer.innerHTML += cardContent;
-    });
+            `;
+            resultsContainer.innerHTML += cardContent;
+        });
+    }
+
+    // Initialize search and filter event listeners
+    document.getElementById('search').addEventListener('input', searchAndFilter);
+    document.getElementById('filter').addEventListener('change', searchAndFilter);
+
+    renderResults(dataItems); // Initial render
 };
 </script>
 
