@@ -27,15 +27,14 @@
             text-align: center;
         }
 
-        /* Dynamic container for search and filter to match card width */
+        /* Container for filter and search */
         .search-container {
             width: 80%;
-            max-width: 600px;
+            min-width: 200px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-sizing: border-box;
         }
 
         /* Search Bar and Dropdown Styling */
@@ -54,33 +53,32 @@
         /* Result Cards */
         .result-card {
             width: 80%;
-            max-width: 600px;
             margin: 0 auto 20px;
-            padding: 0;
+            padding: 0; /* Remove all padding from the card */
             border: 1px solid #e1e4e8;
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
         }
 
         /* Card Header */
         .card-header {
             width: 100%;
-            padding: 10px 15px;
+            padding: 10px 15px; /* Add padding to the header for internal spacing */
             background-color: #00203E;
             color: white;
             font-size: 1.2em;
             font-weight: bold;
             border-radius: 8px 8px 0 0;
-            box-sizing: border-box;
-            padding-left: 30px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+             padding-left: 30px;
         }
 
         /* Card Content */
         .card-content {
-            padding: 10px 15px;
-            padding-left: 20px;
+            padding: 10px 15px; /* Add padding inside the content area */
+            padding-left: 20px; /* Increase left padding on pills */
         }
 
         /* Result Fields */
@@ -116,9 +114,18 @@
         }
 
         /* Responsive Search Container */
+        @media (max-width: 1024px) {
+            .search-container {
+                width: 50%; /* Adjust width for smaller screens */
+            }
+        }
+
         @media (max-width: 768px) {
-            .result-card, .search-container {
-                width: 90%; /* Full width on smaller screens */
+            .result-card {
+                width: 100%; /* Full width on smaller screens */
+            }
+            .search-container {
+                width: 80%; /* Wider search container on very small screens */
             }
         }
     </style>
@@ -272,23 +279,28 @@
                             return cardContent;
                         }).join('');
                     } else {
-                        resultsContainer.innerHTML = `<div class="no-results">No results found.</div>`;
+                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                     }
                 };
 
-                document.getElementById('search').addEventListener('input', (e) => {
-                    displayResults(e.target.value.toLowerCase(), document.getElementById('filter').value);
+                // Initial display
+                displayResults();
+
+                // Search input handler
+                document.getElementById('search').addEventListener('input', (event) => {
+                    const query = event.target.value.toLowerCase();
+                    const filterType = document.getElementById('filter').value;
+                    displayResults(query, filterType);
                 });
 
-                document.getElementById('filter').addEventListener('change', (e) => {
-                    displayResults(document.getElementById('search').value.toLowerCase(), e.target.value);
+                // Filter change handler
+                document.getElementById('filter').addEventListener('change', (event) => {
+                    const query = document.getElementById('search').value.toLowerCase();
+                    const filterType = event.target.value;
+                    displayResults(query, filterType);
                 });
-
-                displayResults(); // Initial display
-            })
-            .catch(error => console.error(error));
+            });
     };
 </script>
-
 </body>
 </html>
