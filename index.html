@@ -243,11 +243,12 @@
                 pageContext: /- \*\*Page Context\*\*: (.*)/,
                 notes: /- \*\*Notes\*\*: (.*)/,
                 exceptions: /- \*\*Exceptions\*\*: (.*)/,
-                status: /-\s*\*\*Status\*\*:\s*(Archived|Active|Inactive)/i, 
-                tags: /- \*\*Tags\*\*: (.*)/
+                status: /- \*\*Status\*\*: (.*)/,
+                tags: /- \*\*Tags\*\*: (.*)/,
             };
 
-            for (let match; (match = entryPattern.exec(markdownContent));) {
+            let match;
+            while (match = entryPattern.exec(markdownContent)) {
                 const entryTitle = match[1].trim();
                 const entryContent = match[2];
                 const data = { title: entryTitle, type: entryTitle.includes('eVar') ? 'eVar' : 'Prop' };
