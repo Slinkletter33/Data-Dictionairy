@@ -7,133 +7,134 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
-        /* General Body Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #F7F7F7;
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+       /* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F7F7F7;
+    color: #333333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        /* Title Styling */
-        h1 {
-            color: #0071bc;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+/* Title Styling */
+h1 {
+    color: #0071bc;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
 
-        /* Container for filter and search */
-        .search-container {
-            width: 80%;
-            min-width: 200px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Container for filter and search */
+.search-container {
+    width: 80%; /* Ensure it has the same width as the result cards */
+    min-width: 200px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
 
-        /* Search Bar and Dropdown Styling */
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: white;
-            color: #333333;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
+/* Search Bar and Dropdown Styling */
+input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #333333;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
 
-        /* Result Cards */
-        .result-card {
-            width: 80%; /* Ensures consistent width */
-            max-width: 600px; /* Optional: Max width for better readability */
-            margin: 0 auto 20px;
-            padding: 0;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            flex: 0 1 auto; /* Prevents flex-based shrinkage */
-        }
+/* Result Cards */
+.result-card {
+    width: 80%; /* Same as search container */
+    max-width: 600px; /* Optional: Max width for better readability */
+    margin: 0 auto 20px;
+    padding: 0;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto; /* Prevent flex shrinkage */
+    min-width: 400px; /* Ensure cards don’t shrink below a certain size */
+}
 
-        /* Card Header */
-        .card-header {
-            width: 100%;
-            padding: 10px 15px;
-            background-color: #00203E;
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 8px 8px 0 0;
-            box-sizing: border-box;
-            padding-left: 30px;
-        }
+/* Card Header */
+.card-header {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #00203E;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
+    padding-left: 30px;
+}
 
-        /* Card Content */
-        .card-content {
-            width: 100%;
-            padding: 10px 15px;
-            padding-left: 20px;
-            box-sizing: border-box;
-        }
+/* Card Content */
+.card-content {
+    padding: 10px 15px;
+    padding-left: 20px;
+}
 
-        /* Result Fields */
-        .card-field {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
+/* Result Fields */
+.card-field {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
 
-        /* Pill Styling for field names */
-        .pill {
-            display: inline-block;
-            background-color: #068682;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-right: 10px;
-        }
+/* Pill Styling for field names */
+.pill {
+    display: inline-block;
+    background-color: #068682;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-right: 10px;
+}
 
-        /* Styling for the result text next to the pill */
-        .result {
-            display: inline-block;
-            font-size: 16px;
-            margin-top: 5px;
-            flex: 1;
-        }
+/* Styling for the result text next to the pill */
+.result {
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 5px;
+    flex: 1;
+}
 
-        /* No results message styling */
-        .no-results {
-            color: #ff0000;
-            font-size: 1.2em;
-        }
+/* No results message styling */
+.no-results {
+    color: #ff0000;
+    font-size: 1.2em;
+}
 
-        /* Responsive Search Container */
-        @media (max-width: 1024px) {
-            .search-container {
-                width: 50%;
-            }
-        }
+/* Responsive Search Container */
+@media (max-width: 1024px) {
+    .search-container {
+        width: 50%; /* Adjust width for smaller screens */
+    }
+}
 
-        @media (max-width: 768px) {
-            .result-card {
-                width: 100%;
-            }
-            .search-container {
-                width: 80%;
-            }
-        }
+@media (max-width: 768px) {
+    .result-card {
+        width: 100%; /* Full width on smaller screens */
+    }
+    .search-container {
+        width: 80%; /* Wider search container on very small screens */
+    }
+}
+
     </style>
 </head>
 <body>
