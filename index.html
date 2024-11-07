@@ -7,146 +7,177 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
-        /* General Body Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #F7F7F7;
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F7F7F7;
+    color: #333333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        /* Title Styling */
-        h1 {
-            color: #0071bc;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+/* Title Styling */
+h1 {
+    color: #0071bc;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    z-index: 10; /* Ensures the header stays above other content */
+    padding: 10px 0;
+}
 
-        /* Container for filter and search */
-        .search-container {
-            width: 80%;
-            min-width: 200px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Container for filter and search */
+.search-container {
+    width: 80%;
+    min-width: 200px;
+    margin-bottom: 20px;
+    position: sticky;
+    z-index: 10; /* Ensures the header stays above other content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        /* Search Bar and Dropdown Styling */
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            background-color: white;
-            color: #333333;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
+/* Search Bar and Dropdown Styling */
+input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 20px; /* Rounded corners */
+    background-color: white;
+    color: #333333;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s ease; /* Smooth transition */
+}
 
-        /* Result Cards */
-        .result-card {
-            width: 80%;
-            margin: 0 auto 20px;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #f5f7f9 0%, #e9eff1 100%);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
-            overflow: hidden;
-            transition: background 0.3s ease;
-        }
+input[type="text"]:focus, select:focus {
+    box-shadow: 0 0 8px rgba(0, 123, 188, 0.6); /* Blue glow on focus */
+    border-color: #0071bc;
+    outline: none;
+}
 
-        .result-card:hover {
-            background: linear-gradient(135deg, #f0f8ff 0%, #d1e7f2 100%);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transform: translateY(-3px);
-        }
+/* Ensure the results container takes full width */
+#results {
+    width: 100%; /* Ensures it uses full width available */
+    padding: 0 10px; /* Optional: Adds padding around the cards */
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
 
-        /* Card Header */
-        .card-header {
-            width: 100%;
-            padding: 15px;
-            background-color: #00203E;
-            color: white;
-            font-size: 1.4em;
-            font-weight: bold;
-            border-radius: 8px 8px 0 0;
-        }
+/* Result Cards */
+.result-card {
+    width: 80%; /* Always 80% of the parent container */
+    margin: 0 auto 20px; /* Centers the card horizontally */
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f7f9 0%, #e9eff1 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* Ensures padding and border don't affect width */
+    overflow: hidden; /* Prevents overflow from shrinking the card */
+    transition: background 0.3s ease; /* Smooth transition on hover */
+}
 
-        /* Card Content */
-        .card-content {
-            padding: 10px 15px;
-            padding-left: 20px;
-        }
+.result-card:hover {
+    background: linear-gradient(135deg, #f0f8ff 0%, #d1e7f2 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow on hover */
+    cursor: pointer;
+    transform: translateY(-3px); /* Slightly lift the card */
+}
 
-        /* Result Fields */
-        .card-field {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
+/* Card Header */
+.card-header {
+    width: 100%;
+    padding: 15px 15px;
+    background-color: #00203E;
+    color: white;
+    font-size: 1.4em; /* Slightly larger title */
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
+    padding-left: 30px;
+}
 
-        /* Pill Styling for field names */
-        .pill {
-            display: inline-block;
-            background-color: #0071bc;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 14px;
-            margin-right: 8px;
-        }
+/* Card Content */
+.card-content {
+    padding: 10px 15px;
+    padding-left: 20px; /* Increased left padding */
+}
 
-        /* Styling for the result text next to the pill */
-        .result {
-            display: inline-block;
-            font-size: 16px;
-            margin-top: 5px;
-        }
+/* Result Fields */
+.card-field {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
 
-        /* Expand button */
-        .expand-btn {
-            background-color: #0071bc;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-        }
+/* Pill Styling for field names */
+.pill {
+    display: inline-block;
+    background-color: #0071bc; /* Primary color */
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 14px;
+    margin-right: 8px;
+}
 
-        /* Expandable Content */
-        .expanded-content {
-            display: none;
-            margin-top: 10px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
+/* Styling for the result text next to the pill */
+.result {
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 5px;
+    flex: 1;
+}
 
-        /* Responsive Search Container */
-        @media (max-width: 1024px) {
-            .search-container {
-                width: 50%;
-            }
-        }
+/* No results message styling */
+.no-results {
+    color: #ff0000;
+    font-size: 1.2em;
+}
 
-        @media (max-width: 768px) {
-            .result-card {
-                width: 90%;
-            }
-            .search-container {
-                width: 80%;
-            }
-        }
+/* Responsive Search Container */
+@media (max-width: 1024px) {
+    .search-container {
+        width: 50%; /* Adjusts width for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .result-card {
+        width: 90%; /* Adjusts card width to 90% on smaller screens */
+    }
+    .search-container {
+        width: 80%; /* Wider search container on very small screens */
+    }
+}
+
+/* Card Footer (if needed in the future) */
+/* .card-footer {
+    padding: 10px 15px;
+    background-color: #f1f1f1;
+    text-align: center;
+    border-radius: 0 0 8px 8px;
+    border-top: 1px solid #e1e4e8;
+} */
+
+/* Smooth Scroll for Result Cards */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Fade-in Animation for Cards */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
     </style>
 </head>
 <body>
@@ -191,7 +222,7 @@
         const extractData = (markdownContent) => {
             const dataEntries = [];
             const entryPattern = /## (.*?)(\n[\s\S]*?)(?=##|$)/g;
-
+            
             const patterns = {
                 description: /- \*\*Description\*\*: (.*)/,
                 exampleValues: /- \*\*Example Values\*\*: (.*)/,
@@ -205,7 +236,7 @@
             for (const entryMatch of markdownContent.matchAll(entryPattern)) {
                 const entryContent = entryMatch[2];
                 const data = { title: entryMatch[1].trim() };
-
+                
                 Object.keys(patterns).forEach(key => {
                     const fieldMatch = entryContent.match(patterns[key]);
                     if (fieldMatch && fieldMatch[1] && isValidField(fieldMatch[1])) {
@@ -215,7 +246,7 @@
 
                 dataEntries.push(data);
             }
-
+            
             return dataEntries;
         };
 
@@ -223,7 +254,7 @@
         const fetchAndProcess = async (source) => {
             const markdownContent = await fetchMarkdown(source.url);
             const entries = extractData(markdownContent);
-
+            
             entries.forEach(entry => {
                 entry.type = source.type; 
                 dataItems.push(entry);
@@ -240,78 +271,86 @@
                     });
                 });
 
-                // Function to toggle expanded content visibility
-                window.toggleExpand = function(cardId) {
-                    const expandedContent = document.getElementById(`expanded-content-${cardId}`);
-                    expandedContent.style.display = expandedContent.style.display === 'block' ? 'none' : 'block';
-                };
+                // Display results based on search query and filter
+                const displayResults = (query = '', filterType = 'all') => {
+                    const resultsContainer = document.getElementById('results');
+                    
+                    const filteredItems = dataItems.filter(doc => {
+                        const matchesType = filterType === 'all' || doc.type === filterType;
+                        const matchesQuery = query ? 
+                            (doc.title && doc.title.toLowerCase().includes(query)) : true; // Check only the title
+                        return matchesType && matchesQuery;
+                    });
 
-                // Display results in cards
-                const updateResults = (query = "") => {
-                    const filteredItems = index.search(query).map(result => dataItems[result.ref]);
-
-                    const filterType = document.getElementById('filter').value;
-                    const filteredByType = filterType === 'all' ? filteredItems : filteredItems.filter(item => item.type === filterType);
-
-                    const resultContainer = document.getElementById('results');
-                    resultContainer.innerHTML = '';
-
-                    if (filteredByType.length === 0) {
-                        resultContainer.innerHTML = '<p>No results found!</p>';
-                    } else {
-                        filteredByType.forEach((item, index) => {
-                            const cardHTML = `
+                    if (filteredItems.length > 0) {
+                        resultsContainer.innerHTML = filteredItems.map(doc => {
+                            const { title, description, exampleValues, pageContext, notes, exceptions, status, tags } = doc;
+                            let cardContent = `
                                 <div class="result-card">
-                                    <div class="card-header">
-                                        ${item.title}
-                                        <button class="expand-btn" onclick="toggleExpand(${index})">Expand</button>
-                                    </div>
+                                    <div class="card-header">${title}</div>
                                     <div class="card-content">
-                                        <div class="card-field">
-                                            <span class="pill">${item.type}</span>
-                                            <span class="result">${item.description || 'No description available.'}</span>
-                                        </div>
-                                        <div id="expanded-content-${index}" class="expanded-content">
+                                        ${isValidField(description) ? `
                                             <div class="card-field">
-                                                <strong>Example Values:</strong> ${item.exampleValues || 'N/A'}
-                                            </div>
+                                                <div class="pill">Description:</div>
+                                                <div class="result">${description}</div>
+                                            </div>` : ''}
+                                        ${isValidField(exampleValues) ? `
                                             <div class="card-field">
-                                                <strong>Page Context:</strong> ${item.pageContext || 'N/A'}
-                                            </div>
+                                                <div class="pill">Example Values:</div>
+                                                <div class="result">${exampleValues}</div>
+                                            </div>` : ''}
+                                        ${isValidField(pageContext) ? `
                                             <div class="card-field">
-                                                <strong>Notes:</strong> ${item.notes || 'N/A'}
-                                            </div>
+                                                <div class="pill">Page Context:</div>
+                                                <div class="result">${pageContext}</div>
+                                            </div>` : ''}
+                                        ${isValidField(notes) ? `
                                             <div class="card-field">
-                                                <strong>Exceptions:</strong> ${item.exceptions || 'N/A'}
-                                            </div>
+                                                <div class="pill">Notes:</div>
+                                                <div class="result">${notes}</div>
+                                            </div>` : ''}
+                                        ${isValidField(exceptions) ? `
                                             <div class="card-field">
-                                                <strong>Status:</strong> ${item.status || 'N/A'}
-                                            </div>
-                                        </div>
+                                                <div class="pill">Exceptions:</div>
+                                                <div class="result">${exceptions}</div>
+                                            </div>` : ''}
+                                        ${isValidField(status) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Status:</div>
+                                                <div class="result">${status}</div>
+                                            </div>` : ''}
+                                        ${isValidField(tags) ? `
+                                            <div class="card-field">
+                                                <div class="pill">Tags:</div>
+                                                <div class="result">${tags}</div>
+                                            </div>` : ''}
                                     </div>
-                                </div>
-                            `;
-                            resultContainer.innerHTML += cardHTML;
-                        });
+                                </div>`;
+                            return cardContent;
+                        }).join('');
+                    } else {
+                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
                     }
                 };
 
-                // Search input event listener
+                // Initial display
+                displayResults();
+
+                // Search input handler
                 document.getElementById('search').addEventListener('input', (event) => {
-                    updateResults(event.target.value);
+                    const query = event.target.value.toLowerCase();
+                    const filterType = document.getElementById('filter').value;
+                    displayResults(query, filterType);
                 });
 
-                // Filter event listener
+                // Filter change handler
                 document.getElementById('filter').addEventListener('change', (event) => {
-                    updateResults(document.getElementById('search').value);
+                    const query = document.getElementById('search').value.toLowerCase();
+                    const filterType = event.target.value;
+                    displayResults(query, filterType);
                 });
-
-                // Initial display of results
-                updateResults();
-            })
-            .catch(error => console.error('Error fetching data:', error));
+            });
     };
 </script>
-
 </body>
 </html>
