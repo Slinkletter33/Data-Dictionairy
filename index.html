@@ -247,14 +247,16 @@
                 tags: /- \*\*Tags\*\*: (.*)/
             };
 
-            for (const entryMatch of markdownContent.matchAll(entryPattern)) {
-                const entryContent = entryMatch[2];
-                const data = { title: entryMatch[1], type: entryMatch[1].includes('eVar') ? 'eVar' : 'Prop' };
+            for (let match; (match = entryPattern.exec(markdownContent));) {
+                const entryTitle = match[1].trim();
+                const entryContent = match[2];
+                const data = { title: entryTitle, type: entryTitle.includes('eVar') ? 'eVar' : 'Prop' };
 
+                // Extract fields based on regex patterns
                 for (const [field, pattern] of Object.entries(patterns)) {
-                    const match = entryContent.match(pattern);
-                    if (match) {
-                        data[field] = match[1];
+                    const fieldMatch = entryContent.match(pattern);
+                    if (fieldMatch) {
+                        data[field] = fieldMatch[1].trim();
                     }
                 }
 
