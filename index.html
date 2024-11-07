@@ -245,6 +245,8 @@ window.onload = async function() {
                 }
             }
 
+            // Ensure tags is always an array
+            doc.tags = Array.isArray(doc.tags) ? doc.tags : (doc.tags ? [doc.tags] : []);
             dataEntries.push(doc);
         }
         return dataEntries;
