@@ -52,33 +52,39 @@
 
         /* Result Cards */
         .result-card {
-            width: 80%;
+            width: 80%; /* Ensures consistent width */
+            max-width: 600px; /* Optional: Max width for better readability */
             margin: 0 auto 20px;
-            padding: 0; /* Remove all padding from the card */
+            padding: 0;
             border: 1px solid #e1e4e8;
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            flex: 0 1 auto; /* Prevents flex-based shrinkage */
         }
 
         /* Card Header */
         .card-header {
             width: 100%;
-            padding: 10px 15px; /* Add padding to the header for internal spacing */
+            padding: 10px 15px;
             background-color: #00203E;
             color: white;
             font-size: 1.2em;
             font-weight: bold;
             border-radius: 8px 8px 0 0;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
-             padding-left: 30px;
+            box-sizing: border-box;
+            padding-left: 30px;
         }
 
         /* Card Content */
         .card-content {
-            padding: 10px 15px; /* Add padding inside the content area */
-            padding-left: 20px; /* Increase left padding on pills */
+            width: 100%;
+            padding: 10px 15px;
+            padding-left: 20px;
+            box-sizing: border-box;
         }
 
         /* Result Fields */
@@ -116,16 +122,16 @@
         /* Responsive Search Container */
         @media (max-width: 1024px) {
             .search-container {
-                width: 50%; /* Adjust width for smaller screens */
+                width: 50%;
             }
         }
 
         @media (max-width: 768px) {
             .result-card {
-                width: 100%; /* Full width on smaller screens */
+                width: 100%;
             }
             .search-container {
-                width: 80%; /* Wider search container on very small screens */
+                width: 80%;
             }
         }
     </style>
@@ -156,19 +162,16 @@
 
         const dataItems = [];
 
-        // Fetch Markdown content
         async function fetchMarkdown(url) {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error fetching ${url}`);
             return await response.text();
         }
 
-        // Validate fields (skip if "N/A", "None", or empty)
         const isValidField = (value) => {
             return value && value.trim() !== 'N/A' && value.trim() !== 'None' && value.trim() !== '';
         };
 
-        // Extract structured data from markdown content using regex
         const extractData = (markdownContent) => {
             const dataEntries = [];
             const entryPattern = /## (.*?)(\n[\s\S]*?)(?=##|$)/g;
@@ -200,7 +203,6 @@
             return dataEntries;
         };
 
-        // Process each Markdown file
         const fetchAndProcess = async (source) => {
             const markdownContent = await fetchMarkdown(source.url);
             const entries = extractData(markdownContent);
@@ -211,7 +213,6 @@
             });
         };
 
-        // Fetch all sources
         Promise.all(sources.map(fetchAndProcess))
             .then(() => {
                 const index = lunr(function () {
@@ -221,14 +222,13 @@
                     });
                 });
 
-                // Display results based on search query and filter
                 const displayResults = (query = '', filterType = 'all') => {
                     const resultsContainer = document.getElementById('results');
                     
                     const filteredItems = dataItems.filter(doc => {
                         const matchesType = filterType === 'all' || doc.type === filterType;
                         const matchesQuery = query ? 
-                            (doc.title && doc.title.toLowerCase().includes(query)) : true; // Check only the title
+                            (doc.title && doc.title.toLowerCase().includes(query)) : true;
                         return matchesType && matchesQuery;
                     });
 
@@ -279,28 +279,25 @@
                             return cardContent;
                         }).join('');
                     } else {
-                        resultsContainer.innerHTML = `<p class="no-results">No results found for "${query}".</p>`;
+                        resultsContainer.innerHTML = '<p class="no-results">No matching results found.</p>';
                     }
                 };
 
-                // Initial display
+                document.getElementById('search').addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    displayResults(query, document.getElementById('filter').value);
+                });
+
+                document.getElementById('filter').addEventListener('change', (e) => {
+                    const filterType = e.target.value;
+                    displayResults(document.getElementById('search').value.toLowerCase(), filterType);
+                });
+
                 displayResults();
-
-                // Search input handler
-                document.getElementById('search').addEventListener('input', (event) => {
-                    const query = event.target.value.toLowerCase();
-                    const filterType = document.getElementById('filter').value;
-                    displayResults(query, filterType);
-                });
-
-                // Filter change handler
-                document.getElementById('filter').addEventListener('change', (event) => {
-                    const query = document.getElementById('search').value.toLowerCase();
-                    const filterType = event.target.value;
-                    displayResults(query, filterType);
-                });
-            });
+            })
+            .catch(err => console.error(err));
     };
 </script>
+
 </body>
 </html>
