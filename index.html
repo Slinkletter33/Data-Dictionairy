@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@2.0.3/marked.min.js"></script>
     <style>
-       /* General Body Styling */
+ /* General Body Styling */
 body {
     font-family: Arial, sans-serif;
     background-color: #F7F7F7;
@@ -62,15 +62,12 @@ input[type="text"], select {
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     box-sizing: border-box; /* Ensure padding doesn't affect width */
-    display: flex;
-    flex-direction: column;
-    flex: 0 1 auto; /* Prevent flex shrinkage */
     min-width: 400px; /* Ensure cards don’t shrink below a certain size */
 }
 
 /* Card Header */
 .card-header {
-    width: 100%;
+    width: 100%; /* Full width */
     padding: 10px 15px;
     background-color: #00203E;
     color: white;
@@ -90,8 +87,7 @@ input[type="text"], select {
 /* Result Fields */
 .card-field {
     margin-bottom: 15px;
-    display: flex;
-    align-items: center;
+    display: block; /* Ensure fields stack vertically */
 }
 
 /* Pill Styling for field names */
